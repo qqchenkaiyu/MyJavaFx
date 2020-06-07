@@ -1,0 +1,10 @@
+[
+  {
+    "ip": "192.168.110.129",
+    "servicePassword": "qq634691",
+    "rootPassword": "qq634691",
+    "rootUsername": "root",
+    "port": 22,
+    "serviceUsername": "chenkaiyu"
+  }
+]
