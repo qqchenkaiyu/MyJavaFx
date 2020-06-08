@@ -4,6 +4,9 @@ package ch.makery.address.util;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import ch.makery.address.MyMainApp;
 import ch.makery.address.anotation.DefaultView;
@@ -16,6 +19,7 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 
 /**
@@ -24,6 +28,7 @@ import lombok.Data;
  * 需要自定义app指定defaultview 不然报错
  */
 @Data
+@Slf4j
 public abstract class MainApp extends Application
 {
     public String fxPackage ;
@@ -41,13 +46,17 @@ public abstract class MainApp extends Application
         showFragment("view/"+DefaultView);
     }
     public MainApp() {
-        ch.makery.address.anotation.DefaultView annotation =
+        Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+            DialogUtils.handleError(t,e);
+        });
+        DefaultView annotation =
                 MyMainApp.class.getAnnotation(DefaultView.class);
         if(annotation==null){
             throw new RuntimeException("DefaultView not set!!");
         }
         DefaultView =  annotation.value();
     }
+
 
     public  void initRootLayout(){
         try {
@@ -57,10 +66,8 @@ public abstract class MainApp extends Application
             rootController=loader.getController();
             rootController.setMainApp(this);
             rootController.initController();
-
             Scene scene = new Scene(rootLayout);
             primaryStage.setScene(scene);
-            //primaryStage.setAlwaysOnTop(true);
             primaryStage.setTitle(title);
             primaryStage.show();
             primaryStage.setOnCloseRequest(arg0 -> System.out.println("close"));

@@ -20,6 +20,9 @@ public class ServerConfigController extends EditDialogController<ServerConfig> {
     @FXML
     private TextField 服务器地址;
 
+    @FXML
+    private TextField 进程用户名;
+
     @Override
     public boolean isInputValid() {
         return true;
@@ -28,17 +31,18 @@ public class ServerConfigController extends EditDialogController<ServerConfig> {
     @Override
     public void save() {
         obj.setIp(服务器地址.getText());
-        obj.setServicePassword(密码.getText());
+        obj.setRootPassword(密码.getText());
         obj.setPort(Integer.valueOf(端口.getText()));
-        obj.setServiceUsername(用户名.getText());
+        obj.setRootUsername(用户名.getText());
+        obj.setServiceUsername(进程用户名.getText());
     }
 
     @Override
     public void initController() {
-
-        密码.setText(obj.getServicePassword());
+        密码.setText(obj.getRootPassword());
         用户名.setText(obj.getServiceUsername());
-        端口.setText(String.valueOf(obj.getPort()));
+        端口.setText(obj.getPort()==null?"":obj.getPort().toString());
         服务器地址.setText(obj.getIp());
+        进程用户名.setText(obj.getServiceUsername());
     }
 }

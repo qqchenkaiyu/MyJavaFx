@@ -17,7 +17,6 @@
             </HBox>
             <Button layoutX="40.0" layoutY="160.0" mnemonicParsing="false" onAction="#采集日志" text="采集日志" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="160.0" />
             <Button layoutX="189.0" layoutY="160.0" mnemonicParsing="false" onAction="#采集堆栈" text="采集堆栈" AnchorPane.leftAnchor="180.0" AnchorPane.topAnchor="160.0" />
-            <Button layoutX="189.0" layoutY="254.0" mnemonicParsing="false" onAction="#生成覆盖率报告" text="生成覆盖率报告" AnchorPane.leftAnchor="180.0" AnchorPane.topAnchor="254.0" />
             <Button layoutX="40.0" layoutY="254.0" mnemonicParsing="false" onAction="#获取进程id" text="获取进程id" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="254.0" />
             <HBox layoutX="68.0" layoutY="77.0" prefHeight="30.0" prefWidth="563.0" spacing="50.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="269.0" AnchorPane.topAnchor="90.0" />
             <HBox layoutX="68.0" layoutY="23.0" spacing="50.0" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="40.0">

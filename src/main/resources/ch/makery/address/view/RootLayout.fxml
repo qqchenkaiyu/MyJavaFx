@@ -12,11 +12,12 @@
             <items>
               <MenuItem mnemonicParsing="false" onAction="#保存服务器配置" text="保存服务器配置" />
                   <MenuItem mnemonicParsing="false" onAction="#加载服务器配置" text="加载服务器配置" />
+                  <MenuItem mnemonicParsing="false" onAction="#生成覆盖率报告" text="生成覆盖率报告" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Edit">
             <items>
-              <MenuItem mnemonicParsing="false" text="Delete" />
+              <MenuItem mnemonicParsing="false" onAction="#首选项设置" text="首选项设置" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Help">

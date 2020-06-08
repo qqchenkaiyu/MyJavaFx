@@ -8,13 +8,13 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<AnchorPane prefHeight="569.0" prefWidth="609.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.makery.address.view.EditServerConfigController">
+<AnchorPane prefHeight="650.0" prefWidth="609.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.makery.address.view.EditServerConfigController">
    <children>
-      <Label layoutX="81.0" layoutY="48.0" text="服务名:" />
+      <Label layoutX="84.0" layoutY="401.0" text="服务名:" />
       <Label layoutX="74.0" layoutY="104.0" text="日志路径:" />
       <Label layoutX="74.0" layoutY="162.0" text="服务器lib路径:" />
       <Label layoutX="76.0" layoutY="209.0" text="本地换包路径:" />
-      <TextField fx:id="服务名" layoutX="222.0" layoutY="43.0" />
+      <TextField fx:id="服务名" layoutX="225.0" layoutY="396.0" />
       <TextField fx:id="日志路径" layoutX="222.0" layoutY="99.0" prefHeight="30.0" prefWidth="343.0" />
       <TextField fx:id="服务器lib路径" layoutX="222.0" layoutY="157.0" prefHeight="30.0" prefWidth="343.0" />
       <TextArea fx:id="本地换包路径" layoutX="222.0" layoutY="209.0" prefHeight="166.0" prefWidth="352.0" />
@@ -31,7 +31,11 @@
             <Insets left="15.0" right="3.0" />
          </padding>
       </HBox>
-      <Label layoutX="87.0" layoutY="410.0" text="覆盖率文件地址:" />
-      <TextField fx:id="覆盖率文件地址" layoutX="222.0" layoutY="405.0" prefHeight="30.0" prefWidth="343.0" />
+      <Label layoutX="87.0" layoutY="48.0" text="中文服务名:" />
+      <TextField fx:id="中文服务名" layoutX="222.0" layoutY="43.0" prefHeight="30.0" prefWidth="343.0" />
+      <TextField fx:id="启动命令" layoutX="219.0" layoutY="455.0" prefHeight="30.0" prefWidth="343.0" />
+      <Label layoutX="84.0" layoutY="460.0" text="启动命令:" />
+      <TextField fx:id="停止命令" layoutX="219.0" layoutY="507.0" prefHeight="30.0" prefWidth="343.0" />
+      <Label layoutX="84.0" layoutY="512.0" text="停止命令:" />
    </children>
 </AnchorPane>

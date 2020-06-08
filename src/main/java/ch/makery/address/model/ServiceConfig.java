@@ -16,13 +16,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ServiceConfig {
-    private String coveragePath;
+    private String displayName="默认名称";
     private String logPath;
     private String serviceName;
     private String remoteLibDir;
+    private String startCmd;
+    private String stopCmd;
     private String localFiles;
     @Override
     public String toString() {
-        return serviceName;
+        return displayName;
     }
 }

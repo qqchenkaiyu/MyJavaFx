@@ -17,9 +17,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
 import lombok.Data;
 import lombok.SneakyThrows;
+import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -27,7 +27,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Vector;
@@ -50,7 +49,7 @@ public class ServiceController extends Controller {
 
     @FXML
     void 抓包开始(ActionEvent event) throws Exception {
-        for (ServerConfig serverConfig : getSelectedServerConfigs()) {
+        for (ServerConfig serverConfig : rootController.getSelectedServerConfigs()) {
             if (isCapturing) {
                 printWriter.println("exit");
                 printWriter.flush();
@@ -71,7 +70,7 @@ public class ServiceController extends Controller {
                     while (channelShell.isConnected()) {
                         try {
                             Thread.sleep(200);
-                            channelShell.getInputStream().transferTo(System.out);
+                            IOUtils.copy(channelShell.getInputStream(),System.out);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -99,7 +98,7 @@ public class ServiceController extends Controller {
         currentService = 服务名称.getSelectionModel().getSelectedItem();
         服务名称.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> {
-                    System.out.println("服务切换成" + newValue.getServiceName());
+                    System.out.println("服务切换成" + newValue.getDisplayName());
                     currentService = newValue;
                 });
     }
@@ -111,7 +110,7 @@ public class ServiceController extends Controller {
 
     @FXML
     void 停止服务(ActionEvent event) {
-        getSelectedServerConfigs().stream().forEach(serverConfig -> {
+        rootController.getSelectedServerConfigs().stream().forEach(serverConfig -> {
             String res = rootController.getExecResult(serverConfig,
                     "ps -ef|grep " + currentService.getServiceName() +
                             " |grep -v grep|awk '{print $2 } | xargs kill'");
@@ -127,7 +126,7 @@ public class ServiceController extends Controller {
         if(controller.isOkClicked()){
             String res = JSON.toJSONString(serviceConfigs);
             Files.deleteIfExists(ServiceConfig.toPath());
-            Files.writeString(ServiceConfig.toPath(),res, StandardOpenOption.CREATE);
+            Files.write(ServiceConfig.toPath(),res.getBytes(), StandardOpenOption.CREATE);
         }
     }
     @FXML
@@ -140,7 +139,7 @@ public class ServiceController extends Controller {
             serviceConfigs.add(serviceConfig);
             String res = JSON.toJSONString(serviceConfigs);
             Files.deleteIfExists(ServiceConfig.toPath());
-            Files.writeString(ServiceConfig.toPath(),res, StandardOpenOption.CREATE);
+            Files.write(ServiceConfig.toPath(),res.getBytes(), StandardOpenOption.CREATE);
         }
     }
 
@@ -162,23 +161,19 @@ public class ServiceController extends Controller {
     @FXML
     @SneakyThrows
     void 采集日志(ActionEvent event) {
-        for (ServerConfig serverConfig : getSelectedServerConfigs()) {
+        for (ServerConfig serverConfig : rootController.getSelectedServerConfigs()) {
             ChannelSftp channelSftp = rootController.getSftpChannel(serverConfig);
-            try {
                 String localLog = currentService.getServiceName() + serverConfig.getIp() + ".log";
                 channelSftp.get(currentService.getLogPath(),
                         localLog);
-                Runtime.getRuntime().exec("notepad " + localLog);
-            } catch (SftpException e) {
-                e.printStackTrace();
-            }
+                Runtime.getRuntime().exec(rootController.getContext().getTextEditor()+" " + localLog);
         }
     }
 
     @FXML
     @SneakyThrows
     void 上传本地jar包(ActionEvent event) {
-        for (ServerConfig serverConfig : getSelectedServerConfigs()) {
+        for (ServerConfig serverConfig : rootController.getSelectedServerConfigs()) {
             ChannelSftp channelSftp = rootController.getSftpChannel(serverConfig);
             String replaceAll = currentService.getLocalFiles().replaceAll("\\n", "");
             String[] files = replaceAll.split(";");
@@ -192,17 +187,11 @@ public class ServiceController extends Controller {
             DialogUtils.AlertInfomation("上传成功");
         }
     }
-    private List<ServerConfig> getSelectedServerConfigs() {
-        RootController controller = mainApp.getRootController();
-        ObservableList<ServerConfig> items = controller.getServerList().getItems();
-        return items.stream()
-                .filter(serverConfig -> serverConfig.getSelected().get()).collect(
-                        Collectors.toList());
-    }
 
     @FXML
+    @SneakyThrows
     void 采集堆栈(ActionEvent event) {
-        getSelectedServerConfigs().stream().forEach(serverConfig -> {
+        for (ServerConfig serverConfig : rootController.getSelectedServerConfigs()) {
             String pid = rootController.getExecResult(serverConfig,
                     "ps -ef|grep " + currentService.getServiceName() +
                             " |grep -v grep|awk '{print $2 }'");
@@ -211,46 +200,16 @@ public class ServiceController extends Controller {
                             "/下载/heap.bin " + pid);
             System.out.println(execResult);
             ChannelSftp channelSftp = rootController.getSftpChannel(serverConfig);
-            try {
-                channelSftp.get("/home/" + serverConfig.getServiceUsername() + "/下载/heap.bin",
-                        currentService.getServiceName() + serverConfig + ".bin");
-            } catch (SftpException e) {
-                e.printStackTrace();
-            }
-        });
-    }
-@SneakyThrows
-    @FXML
-    void 生成覆盖率报告(ActionEvent event) {
-        for (ServerConfig serverConfig : getSelectedServerConfigs()) {
-            //下载文件到本地
-            ChannelSftp channelSftp = rootController.getSftpChannel(serverConfig);
-            try {
-                Vector<ChannelSftp.LsEntry> files = channelSftp.ls(currentService.getCoveragePath());
-                for (ChannelSftp.LsEntry file : files) {
-                    if(!file.getAttrs().isDir()) {
-                        Path servicePath = new File(currentService.getServiceName()).toPath();
-                        if( Files.notExists(servicePath)){
-                            Files.createDirectory(servicePath);
-                        }
+            channelSftp.get("/home/" + serverConfig.getServiceUsername() + "/下载/heap.bin",
+                    currentService.getServiceName() + serverConfig + ".bin");
 
-                        String destFile = currentService.getServiceName() + "/" + file.getFilename();
-                        channelSftp.get(currentService.getCoveragePath()+"/"+file.getFilename(),
-                                destFile);
-                    }
-                }
-            } catch (SftpException e) {
-                e.printStackTrace();
-            }
         }
-
-        //执行命令生成报告
-        //打开浏览器查看
     }
+
 
     @FXML
     void 获取进程id(ActionEvent event) {
-        getSelectedServerConfigs().stream().forEach(serverConfig -> {
+        rootController.getSelectedServerConfigs().stream().forEach(serverConfig -> {
             String execResult = rootController.getExecResult(serverConfig,
                     "ps -ef|grep " + currentService.getServiceName() +
                             " |grep -v grep|awk '{print $2 }'");

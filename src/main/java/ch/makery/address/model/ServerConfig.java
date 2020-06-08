@@ -17,20 +17,14 @@ public class ServerConfig {
     private String ip;
     private Integer port;
     private String serviceUsername;
-    private String servicePassword;
     private String rootUsername;
     private String rootPassword;
-private SimpleBooleanProperty selected=new SimpleBooleanProperty();
+    private SimpleBooleanProperty selected=new SimpleBooleanProperty();
 
 
     @Override
     public String toString() {
         return ip;
     }
-    //    public  <T> ObservableValue<Boolean> isSelected(T t) {
-//        ServerConfig tt= (ServerConfig) t;
-//        return tt.selected;
-//    }
-    //private boolean selected;
 
 }

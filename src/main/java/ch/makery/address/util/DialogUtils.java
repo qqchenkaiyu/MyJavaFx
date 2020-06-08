@@ -1,7 +1,9 @@
 
 package ch.makery.address.util;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +23,9 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
+@Slf4j
 public class DialogUtils {
 	public static Map<String,String> alertInputWindow(List<String> list){
 		Stage window = new Stage();
@@ -75,6 +79,23 @@ public class DialogUtils {
 		information.setHeaderText(null);
 		information.showAndWait();
 	}
+	public static void handleError(Thread t, Throwable e){
+		String format = getErrInfo(t, e);
+		log.debug(format);
+		Alert information = new Alert(Alert.AlertType.ERROR,e.getMessage());
+		information.setTitle("Error");
+		information.setHeaderText(null);
+		information.setResizable(true);
+		information.showAndWait();
+	}
+
+	private static String getErrInfo(Thread t, Throwable e) {
+		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+		PrintStream printStream = new PrintStream(byteArrayOutputStream);
+		e.printStackTrace(printStream);
+		return String.format("线程%s发生异常,异常信息%s", t.getName(), byteArrayOutputStream.toString());
+	}
+
 	public static Optional<ButtonType> AlertConfirm(String info){
 		Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION,info);
 		confirmation.setHeaderText(null);

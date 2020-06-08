@@ -8,7 +8,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="328.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.makery.address.view.ServerConfigController">
+<AnchorPane prefHeight="410.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.makery.address.view.ServerConfigController">
    <children>
       <GridPane layoutX="59.0" layoutY="186.0" prefHeight="249.0" prefWidth="600.0" AnchorPane.bottomAnchor="79.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <columnConstraints>
@@ -18,6 +18,7 @@
         <rowConstraints>
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
@@ -37,12 +38,12 @@
                   <Insets left="20.0" right="20.0" />
                </GridPane.margin>
             </TextField>
-            <TextField fx:id="密码" GridPane.columnIndex="1" GridPane.rowIndex="3">
+            <TextField fx:id="密码" GridPane.columnIndex="1" GridPane.rowIndex="4">
                <GridPane.margin>
                   <Insets left="20.0" right="20.0" />
                </GridPane.margin>
             </TextField>
-            <Label text="密码" GridPane.rowIndex="3">
+            <Label text="密码" GridPane.rowIndex="4">
                <GridPane.margin>
                   <Insets left="22.0" />
                </GridPane.margin>
@@ -62,6 +63,16 @@
                   <Insets left="22.0" />
                </GridPane.margin>
             </Label>
+            <Label fx:id="进程用户名" text="进程用户名" GridPane.rowIndex="3">
+               <GridPane.margin>
+                  <Insets left="22.0" />
+               </GridPane.margin>
+            </Label>
+            <TextField fx:id="用户名1" GridPane.columnIndex="1" GridPane.rowIndex="3">
+               <GridPane.margin>
+                  <Insets left="20.0" right="20.0" />
+               </GridPane.margin>
+            </TextField>
          </children>
       </GridPane>
       <HBox layoutX="411.0" layoutY="258.0" prefHeight="37.0" prefWidth="143.0" spacing="20.0" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0">
