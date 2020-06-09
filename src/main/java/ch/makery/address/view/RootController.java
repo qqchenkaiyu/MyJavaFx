@@ -166,10 +166,17 @@ public class RootController extends Controller {
         loadConfig(defaultServerConfig);
         preferFile=new File(dir+"/"+"predefine.json");
         if(!preferFile.exists()) {
-            preferFile.createNewFile();
+            context=new Context();
+            Files.write(preferFile.toPath(),JSON.toJSONString(context).getBytes(StandardCharsets.UTF_8),StandardOpenOption.CREATE_NEW);
+
         }else {
             context = JSON.parseObject(new String(Files.readAllBytes(preferFile.toPath())),
                     Context.class);
+            if(context==null){
+                context=new Context();
+                Files.write(preferFile.toPath(),JSON.toJSONString(context).getBytes(StandardCharsets.UTF_8),StandardOpenOption.WRITE);
+            }
+
         }
 
     }

@@ -34,7 +34,7 @@
                 <!-- 按照名称归档 如果名称精确到秒就一秒一个日志文件（-mm-ss） -->
                 <fileNamePattern>${LOG_PATH}/info.%d{yyyy-MM-dd-HH}.%i.gz</fileNamePattern>
                 <!-- 设置单个文件容量  超出就归档 -->
-                <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
                     <maxFileSize>1gb</maxFileSize>
                 </timeBasedFileNamingAndTriggeringPolicy>
                 <!--日志文档保留份数-->

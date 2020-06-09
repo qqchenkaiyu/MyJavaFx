@@ -85,6 +85,7 @@ public class ServiceController extends Controller {
     @SneakyThrows
     @Override
     public void initController() {
+
         rootController = mainApp.getRootController();
         String readString = new String(Files.readAllBytes(ServiceConfig.toPath()));
         serviceConfigs=FXCollections
@@ -97,19 +98,25 @@ public class ServiceController extends Controller {
                     System.out.println("服务切换成" + newValue.getDisplayName());
                     currentService = newValue;
                 });
+        File file = new File(currentService.getServiceName());
+        if(!file.exists()){
+            file.mkdir();
+        }
     }
 
     @FXML
     void 启动服务(ActionEvent event) {
-
+        rootController.getSelectedServerConfigs().stream().forEach(serverConfig -> {
+            String res = rootController.getExecResult(serverConfig,
+                    currentService.getStartCmd());
+        });
     }
 
     @FXML
     void 停止服务(ActionEvent event) {
         rootController.getSelectedServerConfigs().stream().forEach(serverConfig -> {
             String res = rootController.getExecResult(serverConfig,
-                    "ps -ef|grep " + currentService.getServiceName() +
-                            " |grep -v grep|awk '{print $2 } | xargs kill'");
+                    currentService.getStopCmd());
         });
 
     }
@@ -161,7 +168,7 @@ public class ServiceController extends Controller {
             ChannelSftp channelSftp = rootController.getSftpChannel(serverConfig);
             Vector<ChannelSftp.LsEntry> files = channelSftp.ls(currentService.getLogPath());
             for (ChannelSftp.LsEntry file : files) {
-                if(file.getFilename().matches(currentService.getLoggzPatten())){
+                if(file.getFilename().contains(currentService.getLoggzPatten())){
                     channelSftp.get(currentService.getLogPath()+"/"+file.getFilename(),
                             currentService.getServiceName() +"/"+ serverConfig.getIp()+file.getFilename());
                 }
@@ -183,7 +190,6 @@ public class ServiceController extends Controller {
             }
         }
     }
-
     @FXML
     @SneakyThrows
     void 上传本地jar包(ActionEvent event) {
