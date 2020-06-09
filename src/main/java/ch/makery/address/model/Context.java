@@ -8,4 +8,6 @@ public class Context {
     private String textEditor="notepad";
     //覆盖率路径
     private String coveragePath;
+    //覆盖率命令
+    private String coverageCmd;
 }

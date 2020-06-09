@@ -16,7 +16,7 @@
                </children>
             </HBox>
             <Button layoutX="40.0" layoutY="160.0" mnemonicParsing="false" onAction="#采集日志" text="采集日志" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="160.0" />
-            <Button layoutX="189.0" layoutY="160.0" mnemonicParsing="false" onAction="#采集堆栈" text="采集堆栈" AnchorPane.leftAnchor="180.0" AnchorPane.topAnchor="160.0" />
+            <Button layoutX="314.0" layoutY="254.0" mnemonicParsing="false" onAction="#采集堆栈" text="采集堆栈" AnchorPane.leftAnchor="314.0" AnchorPane.topAnchor="254.0" />
             <Button layoutX="40.0" layoutY="254.0" mnemonicParsing="false" onAction="#获取进程id" text="获取进程id" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="254.0" />
             <HBox layoutX="68.0" layoutY="77.0" prefHeight="30.0" prefWidth="563.0" spacing="50.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="269.0" AnchorPane.topAnchor="90.0" />
             <HBox layoutX="68.0" layoutY="23.0" spacing="50.0" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="40.0">
@@ -27,9 +27,10 @@
             </HBox>
             <Button fx:id="抓包开始" layoutX="329.0" layoutY="160.0" mnemonicParsing="false" onAction="#抓包开始" text="抓包开始" />
             <Button layoutX="747.0" layoutY="294.0" mnemonicParsing="false" onAction="#配置服务" text="配置服务" AnchorPane.bottomAnchor="94.0" AnchorPane.rightAnchor="45.0" />
-            <Button layoutX="335.0" layoutY="254.0" mnemonicParsing="false" onAction="#上传本地jar包" text="上传本地jar包" />
+            <Button layoutX="163.0" layoutY="254.0" mnemonicParsing="false" onAction="#上传本地jar包" text="上传本地jar包" />
             <Button layoutX="551.0" layoutY="294.0" mnemonicParsing="false" onAction="#添加服务" text="添加服务" AnchorPane.bottomAnchor="94.0" AnchorPane.rightAnchor="221.0" />
             <Button layoutX="662.0" layoutY="294.0" mnemonicParsing="false" onAction="#删除服务" text="删除服务" AnchorPane.bottomAnchor="94.0" AnchorPane.rightAnchor="133.0" />
+            <Button layoutX="152.0" layoutY="160.0" mnemonicParsing="false" onAction="#采集日志压缩包" text="采集日志压缩包" />
          </children>
       </AnchorPane>
     </children>

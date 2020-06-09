@@ -3,6 +3,7 @@ import com.jcraft.jsch.ChannelShell;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import lombok.SneakyThrows;
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import java.io.InputStream;
@@ -43,7 +44,7 @@ public class tt {
             while (true){
                 try {
                     Thread.sleep(200);
-                    channelShell.getInputStream().transferTo(System.out);
+                    IOUtils.copy(channelShell.getInputStream(),System.out);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -52,7 +53,7 @@ public class tt {
         });
        // channelShell.setCommand("su root");
         PrintWriter printWriter = new PrintWriter(channelShell.getOutputStream());
-        printWriter.println("tcpdump -i ens33   -w /home/chenkaiyu/抓包.cap");
+        printWriter.println("tcpdump -i any   -w /home/chenkaiyu/抓包.cap");
         printWriter.flush();
         Thread.sleep(5000);
        // Thread.sleep(1000);

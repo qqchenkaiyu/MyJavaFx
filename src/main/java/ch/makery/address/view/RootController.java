@@ -21,6 +21,7 @@ import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.layout.AnchorPane;
 import lombok.Data;
 import lombok.SneakyThrows;
+import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -88,9 +89,8 @@ public class RootController extends Controller {
                 }
             }
         }
-
+        Runtime.getRuntime().exec(context.getCoverageCmd());
         //执行命令生成报告
-        //打开浏览器查看
     }
     public List<ServerConfig> getSelectedServerConfigs() {
         RootController controller = mainApp.getRootController();
@@ -102,15 +102,7 @@ public class RootController extends Controller {
     @SneakyThrows
     @FXML
     void 首选项设置(ActionEvent event) {
-        ServerConfig serverConfig = new ServerConfig();
-        DialogController controller =
-                mainApp.openEditDialogForResult("添加服务器", "ServerConfig.fxml", serverConfig);
-        if(controller.okClicked){
-            String jsonString = JSON.toJSONString(serverList.getItems());
-            defaultServerConfig.deleteOnExit();
-            Files.write(defaultServerConfig.toPath(),jsonString.getBytes(), StandardOpenOption.CREATE);
-        }
-
+        Runtime.getRuntime().exec("notepad "+preferFile.getAbsolutePath());
     }
     @FXML
     void 编辑服务器(ActionEvent event) {
@@ -138,7 +130,7 @@ public class RootController extends Controller {
     @SneakyThrows
     void 保存服务器配置(ActionEvent event) {
         String jsonString = JSON.toJSONString(serverList.getItems());
-        Files.writeString(defaultServerConfig.toPath(),jsonString, StandardOpenOption.WRITE);
+        Files.write(defaultServerConfig.toPath(),jsonString.getBytes(), StandardOpenOption.WRITE);
     }
 
     @SneakyThrows
@@ -172,6 +164,14 @@ public class RootController extends Controller {
         String dir = System.getProperty("user.dir");
         defaultServerConfig=new File(dir+"/"+"server.json");
         loadConfig(defaultServerConfig);
+        preferFile=new File(dir+"/"+"predefine.json");
+        if(!preferFile.exists()) {
+            preferFile.createNewFile();
+        }else {
+            context = JSON.parseObject(new String(Files.readAllBytes(preferFile.toPath())),
+                    Context.class);
+        }
+
     }
     @SneakyThrows
     public Session getRootSession(ServerConfig selectedItem) {
@@ -196,8 +196,7 @@ public class RootController extends Controller {
         ChannelExec channel = (ChannelExec) session.openChannel("exec");
         channel.setCommand(cmd);
         channel.connect();
-        byte[] bytes = channel.getInputStream().readAllBytes();
-        return new String(bytes,StandardCharsets.UTF_8);
+        return new String(IOUtils.toByteArray(channel.getInputStream()),StandardCharsets.UTF_8);
     }
     @SneakyThrows
     public ChannelSftp getSftpChannel(ServerConfig selectedItem) {

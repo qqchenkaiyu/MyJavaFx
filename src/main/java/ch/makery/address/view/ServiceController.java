@@ -9,7 +9,6 @@ import com.alibaba.fastjson.JSON;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.ChannelShell;
 import com.jcraft.jsch.Session;
-import com.jcraft.jsch.SftpException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -25,13 +24,10 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.List;
 import java.util.Optional;
 import java.util.Vector;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 @Data
 public class ServiceController extends Controller {
@@ -90,7 +86,7 @@ public class ServiceController extends Controller {
     @Override
     public void initController() {
         rootController = mainApp.getRootController();
-        String readString = Files.readString(ServiceConfig.toPath(), StandardCharsets.UTF_8);
+        String readString = new String(Files.readAllBytes(ServiceConfig.toPath()));
         serviceConfigs=FXCollections
                 .observableArrayList(JSON.parseArray(readString, ServiceConfig.class));
         服务名称.setItems(serviceConfigs);
@@ -152,21 +148,39 @@ public class ServiceController extends Controller {
             serviceConfigs.remove(currentService);
             String res = JSON.toJSONString(serviceConfigs);
             Files.deleteIfExists(ServiceConfig.toPath());
-            Files.writeString(ServiceConfig.toPath(), res, StandardOpenOption.CREATE);
+            Files.write(ServiceConfig.toPath(), res.getBytes(), StandardOpenOption.CREATE);
         }
 
 
 
+    }
+    @SneakyThrows
+    @FXML
+    void 采集日志压缩包(ActionEvent event) {
+        for (ServerConfig serverConfig : rootController.getSelectedServerConfigs()) {
+            ChannelSftp channelSftp = rootController.getSftpChannel(serverConfig);
+            Vector<ChannelSftp.LsEntry> files = channelSftp.ls(currentService.getLogPath());
+            for (ChannelSftp.LsEntry file : files) {
+                if(file.getFilename().matches(currentService.getLoggzPatten())){
+                    channelSftp.get(currentService.getLogPath()+"/"+file.getFilename(),
+                            currentService.getServiceName() +"/"+ serverConfig.getIp()+file.getFilename());
+                }
+            }
+        }
     }
     @FXML
     @SneakyThrows
     void 采集日志(ActionEvent event) {
         for (ServerConfig serverConfig : rootController.getSelectedServerConfigs()) {
             ChannelSftp channelSftp = rootController.getSftpChannel(serverConfig);
-                String localLog = currentService.getServiceName() + serverConfig.getIp() + ".log";
-                channelSftp.get(currentService.getLogPath(),
-                        localLog);
-                Runtime.getRuntime().exec(rootController.getContext().getTextEditor()+" " + localLog);
+            Vector<ChannelSftp.LsEntry> files = channelSftp.ls(currentService.getLogPath());
+            for (ChannelSftp.LsEntry file : files) {
+                if(file.getFilename().endsWith("log")){
+                    channelSftp.get(currentService.getLogPath()+"/"+file.getFilename(),
+                            currentService.getServiceName() +"/"+ serverConfig.getIp()+file.getFilename());
+                    Runtime.getRuntime().exec(rootController.getContext().getTextEditor()+" " + currentService.getServiceName() +"/"+ serverConfig.getIp()+file.getFilename());
+                }
+            }
         }
     }
 

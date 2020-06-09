@@ -37,5 +37,7 @@
       <Label layoutX="84.0" layoutY="460.0" text="启动命令:" />
       <TextField fx:id="停止命令" layoutX="219.0" layoutY="507.0" prefHeight="30.0" prefWidth="343.0" />
       <Label layoutX="84.0" layoutY="512.0" text="停止命令:" />
+      <TextField fx:id="压缩包名格式" layoutX="225.0" layoutY="558.0" prefHeight="30.0" prefWidth="326.0" />
+      <Label layoutX="84.0" layoutY="563.0" text="压缩包名格式" />
    </children>
 </AnchorPane>

@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ServiceConfig {
     private String displayName="默认名称";
+    private String loggzPatten;
     private String logPath;
     private String serviceName;
     private String remoteLibDir;

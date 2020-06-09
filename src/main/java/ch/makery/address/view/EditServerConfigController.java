@@ -24,6 +24,8 @@ public class EditServerConfigController extends EditDialogController<ServiceConf
     private TextField 日志路径;
     @FXML
     private TextField 中文服务名;
+    @FXML
+    private TextField 压缩包名格式;
     @Override
     public boolean isInputValid() {
         return true;
@@ -38,6 +40,7 @@ public class EditServerConfigController extends EditDialogController<ServiceConf
         obj.setLocalFiles(本地换包路径.getText());
         obj.setStartCmd(启动命令.getText());
         obj.setStopCmd(停止命令.getText());
+        obj.setLoggzPatten(压缩包名格式.getText());
     }
 
     @Override
@@ -49,5 +52,6 @@ public class EditServerConfigController extends EditDialogController<ServiceConf
         本地换包路径.setText(obj.getLocalFiles());
         启动命令.setText(obj.getStartCmd());
         停止命令.setText(obj.getStopCmd());
+        压缩包名格式.setText(obj.getLoggzPatten());
     }
 }
