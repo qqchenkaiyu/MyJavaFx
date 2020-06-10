@@ -7,10 +7,7 @@ import ch.makery.address.util.Controller;
 import ch.makery.address.util.DialogController;
 import ch.makery.address.util.DialogUtils;
 import com.alibaba.fastjson.JSON;
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.Session;
+import com.jcraft.jsch.*;
 import javafx.beans.property.BooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -183,39 +180,55 @@ public class RootController extends Controller {
     @SneakyThrows
     public Session getRootSession(ServerConfig selectedItem) {
         if(rootSessionMap.containsKey(selectedItem.getIp())){
-            return rootSessionMap.get(selectedItem.getIp());
+            Session session = rootSessionMap.get(selectedItem.getIp());
+            if(!session.isConnected())session=createNewSession(selectedItem);
+            return session;
         }else {
             if(selectedItem.getRootUsername()==null){
                 throw new Exception("必须提供root用户名密码才能抓包");
             }
-            JSch jsch = new JSch();
-            Session session = jsch.getSession(selectedItem.getRootUsername(), selectedItem.getIp(), selectedItem.getPort());
-            session.setConfig("StrictHostKeyChecking", "no");
-            session.setPassword(selectedItem.getRootPassword());
-            session.connect();
-            rootSessionMap.put(selectedItem.getIp(),session);
-            return session;
+            return createNewSession(selectedItem);
         }
     }
+
+    private Session createNewSession(ServerConfig selectedItem) throws JSchException {
+        JSch jsch = new JSch();
+        Session session = jsch.getSession(selectedItem.getRootUsername(), selectedItem.getIp(), selectedItem.getPort());
+        session.setConfig("StrictHostKeyChecking", "no");
+        session.setPassword(selectedItem.getRootPassword());
+        session.connect();
+        rootSessionMap.put(selectedItem.getIp(),session);
+        return session;
+    }
+
     @SneakyThrows
     public String getExecResult(ServerConfig selectedItem,String cmd) {
         Session session = getRootSession(selectedItem);
         ChannelExec channel = (ChannelExec) session.openChannel("exec");
         channel.setCommand(cmd);
+
         channel.connect();
         return new String(IOUtils.toByteArray(channel.getInputStream()),StandardCharsets.UTF_8);
     }
     @SneakyThrows
     public ChannelSftp getSftpChannel(ServerConfig selectedItem) {
         if(sftpMap.containsKey(selectedItem.getIp())){
-            return sftpMap.get(selectedItem.getIp());
+            ChannelSftp channelSftp = sftpMap.get(selectedItem.getIp());
+            if(channelSftp.isClosed()){
+                channelSftp=createNewChannel(selectedItem);
+            }
+            return channelSftp;
         }else {
-            Session session = getRootSession(selectedItem);
-            ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
-            channel.connect();
-            sftpMap.put(selectedItem.getIp(),channel);
-            return channel;
+            return createNewChannel(selectedItem);
         }
 
+    }
+
+    private ChannelSftp createNewChannel(ServerConfig selectedItem) throws JSchException {
+        Session session = getRootSession(selectedItem);
+        ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
+        channel.connect();
+        sftpMap.put(selectedItem.getIp(),channel);
+        return channel;
     }
 }
