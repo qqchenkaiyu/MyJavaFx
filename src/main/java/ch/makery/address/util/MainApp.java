@@ -96,7 +96,6 @@ public abstract class MainApp extends Application
             loader.setLocation(getClass().getResource(fxPackage+"/"+fxmlPath));
             Pane page = (Pane)loader.load();
             dialogStage.initModality(Modality.NONE);
-            dialogStage.initOwner(primaryStage);
             Scene scene = new Scene(page);
             dialogStage.setScene(scene);
             DialogController controller = (DialogController)loader.getController();
