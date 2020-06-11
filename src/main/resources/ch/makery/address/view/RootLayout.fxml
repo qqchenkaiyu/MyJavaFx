@@ -18,6 +18,12 @@
           <Menu mnemonicParsing="false" text="Edit">
             <items>
               <MenuItem mnemonicParsing="false" onAction="#首选项设置" text="首选项设置" />
+                  <Menu mnemonicParsing="false" text="打开kafka客户端">
+                    <items>
+                      <MenuItem mnemonicParsing="false" onAction="#打开生产者" text="打开生产者" />
+                        <MenuItem mnemonicParsing="false" onAction="#打开消费者" text="打开消费者" />
+                    </items>
+                  </Menu>
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Help">
@@ -36,6 +42,7 @@
                 <MenuItem mnemonicParsing="false" onAction="#添加服务器" text="添加服务器" />
                   <MenuItem mnemonicParsing="false" onAction="#编辑服务器" text="编辑服务器" />
                   <MenuItem mnemonicParsing="false" onAction="#删除服务器" text="删除服务器" />
+                  <MenuItem mnemonicParsing="false" onAction="#复制服务器" text="复制服务器" />
               </items>
             </ContextMenu>
          </contextMenu>

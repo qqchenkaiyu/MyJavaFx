@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane prefHeight="581.0" prefWidth="783.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.makery.address.view.KafkaConsumerController">
+   <children>
+      <Label layoutX="46.0" layoutY="50.0" text="kafka主题:" AnchorPane.leftAnchor="46.0" AnchorPane.topAnchor="50.0" />
+      <TextField fx:id="kafka主题" layoutX="131.0" layoutY="45.0" prefHeight="30.0" prefWidth="634.0" AnchorPane.leftAnchor="131.0" AnchorPane.topAnchor="45.0" />
+      <TextArea fx:id="收到的消息" editable="false" layoutX="131.0" layoutY="107.0" prefHeight="362.0" prefWidth="634.0" AnchorPane.leftAnchor="131.0" AnchorPane.topAnchor="107.0" />
+      <Label layoutX="46.0" layoutY="107.0" text="收到的消息:" AnchorPane.leftAnchor="46.0" AnchorPane.topAnchor="107.0" />
+      <Button layoutX="685.0" layoutY="514.0" mnemonicParsing="false" onAction="#开始监听" text="开始监听" AnchorPane.bottomAnchor="37.0" AnchorPane.rightAnchor="18.0" />
+   </children>
+</AnchorPane>

@@ -29,6 +29,18 @@
         <artifactId>commons-beanutils</artifactId>
         <version>1.9.3</version>
     </dependency>
+        <!--kafka-->
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+            <version>2.3.0</version>
+        </dependency>
+<!--        commons-->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.4</version>
+        </dependency>
 
     <dependency>
         <groupId>org.projectlombok</groupId>
@@ -66,6 +78,11 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.2.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>20.0</version>
         </dependency>
     </dependencies>
     <build>

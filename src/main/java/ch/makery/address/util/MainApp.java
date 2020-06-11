@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import ch.makery.address.MyMainApp;
+import ch.makery.address.anotation.DefaultPackage;
 import ch.makery.address.anotation.DefaultView;
 import ch.makery.address.view.RootController;
 import javafx.application.Application;
@@ -43,7 +44,7 @@ public abstract class MainApp extends Application
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
         initRootLayout();
-        showFragment("view/"+DefaultView);
+        showFragment(DefaultView);
     }
     public MainApp() {
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
@@ -55,12 +56,15 @@ public abstract class MainApp extends Application
             throw new RuntimeException("DefaultView not set!!");
         }
         DefaultView =  annotation.value();
+        DefaultPackage defaultPackage =
+                MyMainApp.class.getAnnotation(DefaultPackage.class);
+        fxPackage=defaultPackage.value();
     }
 
 
     public  void initRootLayout(){
         try {
-            String s = "view/RootLayout.fxml";
+            String s = fxPackage+"/RootLayout.fxml";
             loader.setLocation(this.getClass().getResource(s));
             rootLayout = (BorderPane) loader.load();
             rootController=loader.getController();
@@ -89,9 +93,9 @@ public abstract class MainApp extends Application
             Stage dialogStage=new Stage();
             dialogStage.setTitle(title);
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource(fxmlPath));
+            loader.setLocation(getClass().getResource(fxPackage+"/"+fxmlPath));
             Pane page = (Pane)loader.load();
-            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initModality(Modality.NONE);
             dialogStage.initOwner(primaryStage);
             Scene scene = new Scene(page);
             dialogStage.setScene(scene);
@@ -123,7 +127,7 @@ public abstract class MainApp extends Application
             Stage dialogStage=new Stage();
             dialogStage.setTitle(title);
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("view/"+fxmlPath));
+            loader.setLocation(getClass().getResource(fxPackage+"/"+fxmlPath));
             Pane page = (Pane)loader.load();
             dialogStage.initModality(Modality.WINDOW_MODAL);
             dialogStage.initOwner(primaryStage);
@@ -153,7 +157,7 @@ public abstract class MainApp extends Application
             if(frams.containsKey(fxmlPath)){
                 personOverview=frams.get(fxmlPath);
             }else {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource(fxPackage+"/"+fxmlPath));
                  personOverview = (Pane)loader.load();
 
                 controller = (Controller)loader.getController();

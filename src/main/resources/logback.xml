@@ -1,4 +1,4 @@
-<configuration scan="true" scanPeriod="1 seconds" debug="true">
+<configuration scan="false" scanPeriod="1 seconds" debug="true">
         <!-- 属性设置 -->
         <property name="LOG_PATH" value="./INFO_LOG"/>
         <property name="ERR_PATH" value="./ERR_LOG"/>
@@ -32,9 +32,9 @@
             <file>${LOG_PATH}/info.log</file>
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
                 <!-- 按照名称归档 如果名称精确到秒就一秒一个日志文件（-mm-ss） -->
-                <fileNamePattern>${LOG_PATH}/info.%d{yyyy-MM-dd-HH}.%i.gz</fileNamePattern>
+                <fileNamePattern>${LOG_PATH}/info.%d{yyyy-MM-dd-HH}.%i.log.gz</fileNamePattern>
                 <!-- 设置单个文件容量  超出就归档 -->
-                <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                     <maxFileSize>1gb</maxFileSize>
                 </timeBasedFileNamingAndTriggeringPolicy>
                 <!--日志文档保留份数-->
@@ -47,7 +47,7 @@
             </encoder>
         </appender>
         //控制项目输出级别以及输出路径
-        <root level="DEBUG">
+        <root level="INFO">
             <appender-ref ref="FILE-THREAD"/>
 <!--            <appender-ref ref="ERROR-OUT"/>-->
             <appender-ref ref="STDOUT"/>

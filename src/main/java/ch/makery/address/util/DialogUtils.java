@@ -4,19 +4,15 @@ package ch.makery.address.util;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
 
+import com.google.common.collect.EvictingQueue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TableColumn;
+import javafx.scene.control.*;
 import javafx.scene.control.TableColumn.CellEditEvent;
-import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.DirectoryChooser;
@@ -80,6 +76,8 @@ public class DialogUtils {
 		information.showAndWait();
 	}
 	public static void handleError(Thread t, Throwable e){
+		InvocationTargetException cause = (InvocationTargetException) e.getCause();
+		e=cause.getTargetException();
 		String format = getErrInfo(t, e);
 		log.debug(format);
 		Alert information = new Alert(Alert.AlertType.ERROR,e.getMessage());
@@ -137,5 +135,15 @@ public class DialogUtils {
 		File showDialog = directoryChooser.showDialog(new Stage());
 		if(showDialog==null)return null;
 		return showDialog;
+	}
+	public static void showContent(String content, TextArea textArea, EvictingQueue<Object> queue){
+		queue.add(content);
+		StringJoiner stringJoiner = new StringJoiner(System.lineSeparator());
+		for (Object o : queue) {
+			stringJoiner.add(o.toString());
+		}
+		textArea.clear();
+		textArea.appendText(stringJoiner.toString());
+
 	}
 }

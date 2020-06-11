@@ -1,5 +1,6 @@
 package ch.makery.address;
 
+import ch.makery.address.anotation.DefaultPackage;
 import ch.makery.address.anotation.DefaultView;
 import ch.makery.address.model.ServerConfig;
 import ch.makery.address.util.DialogController;
@@ -26,6 +27,7 @@ import java.util.List;
  *
  */
 @DefaultView("ServiceOverview.fxml")
+@DefaultPackage("view")
 @Data
 public class MyMainApp extends MainApp {
     public MyMainApp() {

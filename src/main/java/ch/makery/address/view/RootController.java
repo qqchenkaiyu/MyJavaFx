@@ -66,6 +66,32 @@ public class RootController extends Controller {
             serverList.getItems().add(serverConfig);
         }
     }
+
+    @FXML
+    void 打开消费者(ActionEvent event) {
+        DialogController kafka消费者 = mainApp.openDialogForResult("kafka消费者", "KafkaConsumer.fxml");
+    }
+
+    @FXML
+    void 打开生产者(ActionEvent event) {
+        DialogController kafka消费者 = mainApp.openDialogForResult("kafka监听者", "KafkaProducer.fxml");
+    }
+
+    @FXML
+    @SneakyThrows
+    void 复制服务器(ActionEvent event) {
+        ServerConfig serverConfig = serverList.getSelectionModel().getSelectedItem();
+        if(serverConfig==null){
+            DialogUtils.AlertInfomation("必须先选中服务器才能复制");
+            return;
+        }
+        ServerConfig clone = JSON.parseObject(JSON.toJSONString(serverConfig),ServerConfig.class);
+        DialogController controller =
+                mainApp.openEditDialogForResult("复制服务器", "ServerConfig.fxml", clone);
+        if(controller.okClicked){
+            serverList.getItems().add(serverConfig);
+        }
+    }
     @SneakyThrows
     @FXML
     void 生成覆盖率报告(ActionEvent event) {

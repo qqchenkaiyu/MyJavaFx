@@ -10,4 +10,6 @@ public class Context {
     private String coveragePath="";
     //覆盖率命令
     private String coverageCmd="";
+    //kafka集群位置
+    private String kafkaServers="192.168.99.100:9092";
 }

@@ -74,7 +74,7 @@ public class ServiceController extends Controller {
                     }
                 });
                 printWriter = new PrintWriter(channelShell.getOutputStream());
-                printWriter.println("tcpdump -i ens33 host " + serverConfig.getIp() + " -w /root/抓包.cap");
+                printWriter.println("tcpdump -i any host " + serverConfig.getIp() + " -w /root/抓包.cap");
                 printWriter.flush();
                 抓包开始.setText("结束抓包");
             }
@@ -98,10 +98,13 @@ public class ServiceController extends Controller {
                     System.out.println("服务切换成" + newValue.getDisplayName());
                     currentService = newValue;
                 });
-        File file = new File(currentService.getServiceName());
-        if(!file.exists()){
-            file.mkdir();
+        for (ServiceConfig serviceConfig : serviceConfigs) {
+            File file = new File(serviceConfig.getServiceName());
+            if(!file.exists()){
+                file.mkdir();
+            }
         }
+
     }
 
     @FXML
