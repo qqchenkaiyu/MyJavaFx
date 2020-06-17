@@ -3,6 +3,7 @@ package ch.makery.address.model;
 import javafx.beans.property.*;
 import lombok.*;
 import lombok.experimental.Accessors;
+import org.apache.commons.lang3.StringUtils;
 
 /**
 * Model class for a Person.
@@ -27,7 +28,7 @@ public class ServerConfig {
 
     @Override
     public String toString() {
-        return ip;
+        return StringUtils.isEmpty(别名)?ip:别名;
     }
 
 }

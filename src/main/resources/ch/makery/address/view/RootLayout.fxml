@@ -19,7 +19,7 @@
           <Menu mnemonicParsing="false" text="Edit">
             <items>
               <MenuItem mnemonicParsing="false" onAction="#首选项设置" text="首选项设置" />
-                  <MenuItem mnemonicParsing="false" onAction="#打开kafka客户端" text="打开kafka客户端"/>
+                  <MenuItem mnemonicParsing="false" onAction="#打开kafka客户端" text="打开kafka客户端" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Help">
@@ -31,7 +31,7 @@
       </MenuBar>
    </top>
    <left>
-      <ListView fx:id="serverList" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+      <ListView fx:id="serverList" prefHeight="416.0" prefWidth="270.0" BorderPane.alignment="CENTER">
          <contextMenu>
             <ContextMenu>
               <items>

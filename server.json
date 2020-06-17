@@ -1,10 +1,1 @@
-[
-  {
-    "ip": "192.168.110.129",
-    "servicePassword": "qq634691",
-    "rootPassword": "qq634691",
-    "rootUsername": "root",
-    "port": 22,
-    "serviceUsername": "chenkaiyu"
-  }
-]
+[{"ip":"192.168.110.129","port":22,"rootPassword":"qq634691","rootUsername":"root","selected":{"bound":false,"name":"","value":true},"serviceUsername":"chenkaiyu","别名":"虚拟机192.168.110.129"}]

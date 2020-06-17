@@ -81,7 +81,7 @@ public class DialogUtils {
 		InvocationTargetException cause = (InvocationTargetException) e.getCause();
 		e=cause.getTargetException();
 		String format = getErrInfo(t, e);
-		log.debug(format);
+		log.error(format);
 		Alert information = new Alert(Alert.AlertType.ERROR,e.getMessage());
 		information.setTitle("Error");
 		information.setHeaderText(null);

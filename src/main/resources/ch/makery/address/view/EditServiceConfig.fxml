@@ -17,7 +17,7 @@
       <TextField fx:id="服务名" layoutX="225.0" layoutY="396.0" />
       <TextField fx:id="日志路径" layoutX="222.0" layoutY="99.0" prefHeight="30.0" prefWidth="343.0" />
       <TextField fx:id="服务器lib路径" layoutX="222.0" layoutY="157.0" prefHeight="30.0" prefWidth="343.0" />
-      <TextArea fx:id="本地换包路径" layoutX="222.0" layoutY="209.0" prefHeight="166.0" prefWidth="352.0" />
+      <TextArea fx:id="本地换包路径" layoutX="222.0" layoutY="209.0" onDragDropped="#增加换包路径" prefHeight="166.0" prefWidth="352.0" />
       <HBox layoutX="411.0" layoutY="258.0" prefHeight="37.0" prefWidth="143.0" spacing="20.0" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0">
          <children>
             <Button layoutX="396.0" layoutY="51.0" mnemonicParsing="false" onAction="#确定" text="确定" />

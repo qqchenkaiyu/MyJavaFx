@@ -13,7 +13,8 @@ public class ServerConfigController extends EditDialogController<ServerConfig> {
 
     @FXML
     private TextField 用户名;
-
+    @FXML
+    private TextField 别名;
     @FXML
     private TextField 端口;
 
@@ -30,6 +31,7 @@ public class ServerConfigController extends EditDialogController<ServerConfig> {
 
     @Override
     public void save() {
+        obj.set别名(别名.getText());
         obj.setIp(服务器地址.getText());
         obj.setRootPassword(密码.getText());
         obj.setPort(Integer.valueOf(端口.getText()));
@@ -39,8 +41,9 @@ public class ServerConfigController extends EditDialogController<ServerConfig> {
 
     @Override
     public void initController() {
+        别名.setText(obj.get别名());
         密码.setText(obj.getRootPassword());
-        用户名.setText(obj.getRootPassword());
+        用户名.setText(obj.getRootUsername());
         端口.setText(obj.getPort()==null?"":obj.getPort().toString());
         服务器地址.setText(obj.getIp());
         进程用户名.setText(obj.getServiceUsername());
