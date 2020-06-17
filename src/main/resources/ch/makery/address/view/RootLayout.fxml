@@ -13,17 +13,13 @@
               <MenuItem mnemonicParsing="false" onAction="#保存服务器配置" text="保存服务器配置" />
                   <MenuItem mnemonicParsing="false" onAction="#加载服务器配置" text="加载服务器配置" />
                   <MenuItem mnemonicParsing="false" onAction="#生成覆盖率报告" text="生成覆盖率报告" />
+                  <MenuItem mnemonicParsing="false" onAction="#服务器时间同步" text="服务器时间同步" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Edit">
             <items>
               <MenuItem mnemonicParsing="false" onAction="#首选项设置" text="首选项设置" />
-                  <Menu mnemonicParsing="false" text="打开kafka客户端">
-                    <items>
-                      <MenuItem mnemonicParsing="false" onAction="#打开生产者" text="打开生产者" />
-                        <MenuItem mnemonicParsing="false" onAction="#打开消费者" text="打开消费者" />
-                    </items>
-                  </Menu>
+                  <MenuItem mnemonicParsing="false" onAction="#打开kafka客户端" text="打开kafka客户端"/>
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Help">

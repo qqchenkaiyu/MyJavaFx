@@ -95,7 +95,7 @@ public abstract class MainApp extends Application
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource(fxPackage+"/"+fxmlPath));
             Pane page = (Pane)loader.load();
-            dialogStage.initModality(Modality.NONE);
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
             Scene scene = new Scene(page);
             dialogStage.setScene(scene);
             DialogController controller = (DialogController)loader.getController();
@@ -107,6 +107,7 @@ public abstract class MainApp extends Application
         }
         catch(IOException e)
         {
+
             e.printStackTrace();
         }
         return null;

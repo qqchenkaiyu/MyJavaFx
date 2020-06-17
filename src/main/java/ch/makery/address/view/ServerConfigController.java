@@ -40,7 +40,7 @@ public class ServerConfigController extends EditDialogController<ServerConfig> {
     @Override
     public void initController() {
         密码.setText(obj.getRootPassword());
-        用户名.setText(obj.getServiceUsername());
+        用户名.setText(obj.getRootPassword());
         端口.setText(obj.getPort()==null?"":obj.getPort().toString());
         服务器地址.setText(obj.getIp());
         进程用户名.setText(obj.getServiceUsername());

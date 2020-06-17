@@ -75,6 +75,8 @@ public class DialogUtils {
 		information.setHeaderText(null);
 		information.showAndWait();
 	}
+
+
 	public static void handleError(Thread t, Throwable e){
 		InvocationTargetException cause = (InvocationTargetException) e.getCause();
 		e=cause.getTargetException();

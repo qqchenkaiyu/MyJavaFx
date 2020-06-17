@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="598.0" prefWidth="823.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.makery.address.view.KafkaClientController">
+   <children>
+      <TabPane layoutX="622.0" layoutY="-23.0" prefHeight="598.0" prefWidth="823.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <tabs>
+          <Tab text="kafka生产者">
+            <content>
+                <AnchorPane prefHeight="528.0" prefWidth="721.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+                    <children>
+                        <Label layoutX="47.0" layoutY="57.0" text="topic" AnchorPane.leftAnchor="47.0" AnchorPane.topAnchor="57.0" />
+                        <TextField fx:id="kafka生产者主题" layoutX="152.0" layoutY="52.0" prefHeight="30.0" prefWidth="360.0" AnchorPane.leftAnchor="152.0" AnchorPane.topAnchor="52.0" />
+                        <Label layoutX="47.0" layoutY="114.0" text="key" AnchorPane.leftAnchor="47.0" AnchorPane.topAnchor="114.0" />
+                        <TextField fx:id="kafka键" layoutX="152.0" layoutY="109.0" prefHeight="30.0" prefWidth="360.0" AnchorPane.leftAnchor="152.0" AnchorPane.topAnchor="109.0" />
+                        <Label layoutX="47.0" layoutY="167.0" text="value" AnchorPane.leftAnchor="47.0" AnchorPane.topAnchor="167.0" />
+                        <TextArea fx:id="kafka值" layoutX="152.0" layoutY="167.0" prefHeight="200.0" prefWidth="360.0" AnchorPane.leftAnchor="152.0" AnchorPane.topAnchor="167.0" />
+                        <Button layoutX="573.0" layoutY="467.0" mnemonicParsing="false" onAction="#发送消息" text="发送" AnchorPane.bottomAnchor="31.0" AnchorPane.rightAnchor="51.0" />
+                        <Label layoutX="54.0" layoutY="420.0" text="发送状态" AnchorPane.leftAnchor="54.0" AnchorPane.topAnchor="420.0" />
+                        <TextArea fx:id="发送状态" editable="false" layoutX="152.0" layoutY="420.0" prefHeight="77.0" prefWidth="360.0" AnchorPane.leftAnchor="152.0" AnchorPane.topAnchor="420.0" />
+                    </children>
+                </AnchorPane>
+
+            </content>
+          </Tab>
+          <Tab text="kafka消费者">
+            <content>
+                <AnchorPane prefHeight="581.0" prefWidth="783.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1">
+                    <children>
+                        <Label layoutX="46.0" layoutY="50.0" text="kafka主题:" AnchorPane.leftAnchor="46.0" AnchorPane.topAnchor="50.0" />
+                        <TextField fx:id="kafka消费者主题" layoutX="131.0" layoutY="45.0" prefHeight="30.0" prefWidth="634.0" AnchorPane.leftAnchor="131.0" AnchorPane.topAnchor="45.0" />
+                        <TextArea fx:id="收到的消息" editable="false" layoutX="131.0" layoutY="107.0" prefHeight="362.0" prefWidth="634.0" AnchorPane.leftAnchor="131.0" AnchorPane.topAnchor="107.0" />
+                        <Label layoutX="46.0" layoutY="107.0" text="收到的消息:" AnchorPane.leftAnchor="46.0" AnchorPane.topAnchor="107.0" />
+                        <Button layoutX="685.0" layoutY="514.0" mnemonicParsing="false" onAction="#开始监听" text="开始监听" AnchorPane.bottomAnchor="37.0" AnchorPane.rightAnchor="18.0" />
+                        <Button layoutX="531.0" layoutY="492.0" mnemonicParsing="false" onAction="#清空" text="清空" AnchorPane.bottomAnchor="37.0" AnchorPane.rightAnchor="242.0" />
+                        <Button layoutX="612.0" layoutY="492.0" mnemonicParsing="false" onAction="#停止监听" text="停止监听" AnchorPane.bottomAnchor="37.0" AnchorPane.rightAnchor="131.0" />
+                    </children>
+                </AnchorPane>
+            </content>
+          </Tab>
+            <Tab text="kafka客户端">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Button layoutX="44.0" layoutY="386.0" mnemonicParsing="false" onAction="#查看所有消费组" text="查看所有消费组" AnchorPane.leftAnchor="44.0" AnchorPane.topAnchor="386.0" />
+                        <GridPane prefHeight="346.0" prefWidth="823.0">
+                           <children>
+                              <TextField fx:id="kafka集群IP" GridPane.columnIndex="1">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </TextField>
+                              <Label text="kafka集群IP">
+                                 <GridPane.margin>
+                                    <Insets left="22.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <TextField fx:id="kafka客户端IP" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </TextField>
+                              <Label text="kafka客户端地址" GridPane.rowIndex="1">
+                                 <GridPane.margin>
+                                    <Insets left="22.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Button mnemonicParsing="false" onAction="#查看特定组消费情况" text="查看特定组消费情况" GridPane.rowIndex="6">
+                                 <GridPane.margin>
+                                    <Insets left="22.0" />
+                                 </GridPane.margin>
+                              </Button>
+                              <TextField fx:id="特定组" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </TextField>
+                              <Label text="kafka客户端用户名" GridPane.rowIndex="3">
+                                 <GridPane.margin>
+                                    <Insets left="22.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label text="kafka客户端密码" GridPane.rowIndex="4">
+                                 <GridPane.margin>
+                                    <Insets left="22.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <Label text="kafka客户端命令行位置" GridPane.rowIndex="5">
+                                 <GridPane.margin>
+                                    <Insets left="22.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <TextField fx:id="kafka客户端用户名" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </TextField>
+                              <TextField fx:id="kafka客户端密码" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </TextField>
+                              <TextField fx:id="kafka客户端命令行位置" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </TextField>
+                              <Label text="kafka客户端端口" GridPane.rowIndex="2">
+                                 <GridPane.margin>
+                                    <Insets left="22.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <TextField fx:id="kafka客户端端口" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                 <GridPane.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </GridPane.margin>
+                              </TextField>
+                           </children>
+                           <columnConstraints>
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="295.0" minWidth="100.0" prefWidth="116.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="484.0" minWidth="120.0" prefWidth="484.0" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                           </rowConstraints>
+                        </GridPane>
+                        <Button layoutX="211.0" layoutY="386.0" mnemonicParsing="false" onAction="#查看所有topic" text="查看所有topic" AnchorPane.leftAnchor="211.0" AnchorPane.topAnchor="386.0" />
+                        <Button layoutX="399.0" layoutY="386.0" mnemonicParsing="false" onAction="#保存" text="保存" AnchorPane.leftAnchor="399.0" AnchorPane.topAnchor="386.0" />
+                     </children></AnchorPane>
+               </content>
+            </Tab>
+        </tabs>
+      </TabPane>
+   </children>
+</AnchorPane>

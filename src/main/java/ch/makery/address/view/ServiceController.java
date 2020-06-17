@@ -130,9 +130,7 @@ public class ServiceController extends Controller {
         DialogController controller =
                 mainApp.openEditDialogForResult("编辑服务信息", "EditServiceConfig.fxml", currentService);
         if(controller.isOkClicked()){
-            String res = JSON.toJSONString(serviceConfigs);
-            Files.deleteIfExists(ServiceConfig.toPath());
-            Files.write(ServiceConfig.toPath(),res.getBytes(), StandardOpenOption.CREATE);
+            FileUtil.writeObject(ServiceConfig,serviceConfigs);
         }
     }
     @FXML
@@ -143,9 +141,7 @@ public class ServiceController extends Controller {
                 mainApp.openEditDialogForResult("添加服务信息", "EditServiceConfig.fxml", serviceConfig);
         if(controller.isOkClicked()){
             serviceConfigs.add(serviceConfig);
-            String res = JSON.toJSONString(serviceConfigs);
-            Files.deleteIfExists(ServiceConfig.toPath());
-            Files.write(ServiceConfig.toPath(),res.getBytes(), StandardOpenOption.CREATE);
+            FileUtil.writeObject(ServiceConfig,serviceConfigs);
         }
     }
 
@@ -156,9 +152,7 @@ public class ServiceController extends Controller {
         ButtonType buttonType1 = buttonType.get();
         if(buttonType1.getText().equals("确定")){
             serviceConfigs.remove(currentService);
-            String res = JSON.toJSONString(serviceConfigs);
-            Files.deleteIfExists(ServiceConfig.toPath());
-            Files.write(ServiceConfig.toPath(), res.getBytes(), StandardOpenOption.CREATE);
+            FileUtil.writeObject(ServiceConfig,serviceConfigs);
         }
 
 
@@ -205,9 +199,12 @@ public class ServiceController extends Controller {
                 String name = file.getName();
                 if(file.exists()) {
                     channelSftp.put(s, currentService.getRemoteLibDir() + "/" + name);
+                    DialogUtils.AlertInfomation("上传成功"+file.getName());
+                }else {
+                    DialogUtils.AlertInfomation("文件不存在"+file.getName());
                 }
             }
-            DialogUtils.AlertInfomation("上传成功");
+
         }
     }
 

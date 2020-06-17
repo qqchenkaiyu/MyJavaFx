@@ -18,7 +18,10 @@ import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.layout.AnchorPane;
 import lombok.Data;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,7 +29,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 import java.util.stream.Collectors;
@@ -36,11 +38,8 @@ import java.util.stream.Collectors;
  */
 @DefaultView("ServiceOverview.fxml")
 @Data
+@Slf4j
 public class RootController extends Controller {
-    private HashMap<String, Session> sessionMap=new HashMap<>();
-    private HashMap<String, Session> rootSessionMap=new HashMap<>();
-    private HashMap<String, ChannelExec> execMap=new HashMap<>();
-    private HashMap<String, ChannelSftp> sftpMap=new HashMap<>();
     private File preferFile;
     @FXML
     private AnchorPane serverPane;
@@ -64,17 +63,13 @@ public class RootController extends Controller {
                 mainApp.openEditDialogForResult("添加服务器", "ServerConfig.fxml", serverConfig);
         if(controller.okClicked){
             serverList.getItems().add(serverConfig);
+            FileUtil.writeObject(defaultServerConfig,serverList.getItems());
         }
-    }
 
-    @FXML
-    void 打开消费者(ActionEvent event) {
-        DialogController kafka消费者 = mainApp.openDialogForResult("kafka消费者", "KafkaConsumer.fxml");
     }
-
     @FXML
-    void 打开生产者(ActionEvent event) {
-        DialogController kafka消费者 = mainApp.openDialogForResult("kafka监听者", "KafkaProducer.fxml");
+    void 打开kafka客户端(ActionEvent event) {
+        DialogController kafka客户端 = mainApp.openDialogForResult("kafka客户端", "kafkaClient.fxml");
     }
 
     @FXML
@@ -89,7 +84,7 @@ public class RootController extends Controller {
         DialogController controller =
                 mainApp.openEditDialogForResult("复制服务器", "ServerConfig.fxml", clone);
         if(controller.okClicked){
-            serverList.getItems().add(serverConfig);
+            serverList.getItems().add(clone);
         }
     }
     @SneakyThrows
@@ -116,8 +111,7 @@ public class RootController extends Controller {
         //执行命令生成报告
     }
     public List<ServerConfig> getSelectedServerConfigs() {
-        RootController controller = mainApp.getRootController();
-        ObservableList<ServerConfig> items = controller.getServerList().getItems();
+        ObservableList<ServerConfig> items = getServerList().getItems();
         return items.stream()
                 .filter(serverConfig -> serverConfig.getSelected().get()).collect(
                         Collectors.toList());
@@ -125,7 +119,12 @@ public class RootController extends Controller {
     @SneakyThrows
     @FXML
     void 首选项设置(ActionEvent event) {
-        Runtime.getRuntime().exec("notepad "+preferFile.getAbsolutePath());
+        DialogController controller =
+                mainApp.openEditDialogForResult("编辑首选项", "ContextController.fxml", context);
+        if(controller.isOkClicked()){
+            FileUtil.writeObject(preferFile,context);
+        }
+
     }
     @FXML
     void 编辑服务器(ActionEvent event) {
@@ -137,6 +136,10 @@ public class RootController extends Controller {
         DialogController controller =
                 mainApp.openEditDialogForResult("编辑服务器", "ServerConfig.fxml", serverConfig);
         serverList.refresh();
+        if(controller.isOkClicked()){
+            FileUtil.writeObject(defaultServerConfig,serverList.getItems());
+        }
+
     }
 
     @FXML
@@ -152,10 +155,23 @@ public class RootController extends Controller {
     @FXML
     @SneakyThrows
     void 保存服务器配置(ActionEvent event) {
-        String jsonString = JSON.toJSONString(serverList.getItems());
-        Files.write(defaultServerConfig.toPath(),jsonString.getBytes(), StandardOpenOption.WRITE);
+        FileUtil.writeObject(defaultServerConfig,serverList.getItems());
     }
-
+    @FXML
+    @SneakyThrows
+    void 服务器时间同步(ActionEvent event) {
+        List<ServerConfig> configs = getSelectedServerConfigs();
+        if(configs.size()==0){
+            DialogUtils.AlertInfomation("必须先选中服务器才能同步");
+            return;
+        }
+        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+        for (ServerConfig serverConfig : configs) {
+            String execResult = getExecResult(serverConfig,
+                    "date -s " + dateTimeFormatter.print(System.currentTimeMillis()));
+            DialogUtils.AlertInfomation("同步成功 服务器时间为"+getExecResult(serverConfig,"date"));
+        }
+    }
     @SneakyThrows
     @FXML
     void 加载服务器配置(ActionEvent event) {
@@ -169,10 +185,7 @@ public class RootController extends Controller {
         if(!configFile.exists()){
             return;
         }
-        byte[] readAllBytes = Files.readAllBytes(configFile.toPath());
-        List<ServerConfig> parse =
-                JSON.parseArray(new String(readAllBytes, StandardCharsets.UTF_8),
-                        ServerConfig.class);
+        List parse = FileUtil.readArray(configFile, ServerConfig.class);
         serverList.setItems(FXCollections.observableList(parse));
         serverList.setCellFactory(CheckBoxListCell.forListView(
                 serverConfig -> {
@@ -205,16 +218,11 @@ public class RootController extends Controller {
     }
     @SneakyThrows
     public Session getRootSession(ServerConfig selectedItem) {
-        if(rootSessionMap.containsKey(selectedItem.getIp())){
-            Session session = rootSessionMap.get(selectedItem.getIp());
-            if(!session.isConnected())session=createNewSession(selectedItem);
-            return session;
-        }else {
             if(selectedItem.getRootUsername()==null){
                 throw new Exception("必须提供root用户名密码才能抓包");
             }
             return createNewSession(selectedItem);
-        }
+
     }
 
     private Session createNewSession(ServerConfig selectedItem) throws JSchException {
@@ -223,7 +231,6 @@ public class RootController extends Controller {
         session.setConfig("StrictHostKeyChecking", "no");
         session.setPassword(selectedItem.getRootPassword());
         session.connect();
-        rootSessionMap.put(selectedItem.getIp(),session);
         return session;
     }
 
@@ -232,29 +239,19 @@ public class RootController extends Controller {
         Session session = getRootSession(selectedItem);
         ChannelExec channel = (ChannelExec) session.openChannel("exec");
         channel.setCommand(cmd);
-
+        log.info("执行命令--{}",cmd);
         channel.connect();
         return new String(IOUtils.toByteArray(channel.getInputStream()),StandardCharsets.UTF_8);
     }
     @SneakyThrows
     public ChannelSftp getSftpChannel(ServerConfig selectedItem) {
-        if(sftpMap.containsKey(selectedItem.getIp())){
-            ChannelSftp channelSftp = sftpMap.get(selectedItem.getIp());
-            if(channelSftp.isClosed()){
-                channelSftp=createNewChannel(selectedItem);
-            }
-            return channelSftp;
-        }else {
             return createNewChannel(selectedItem);
-        }
-
     }
 
     private ChannelSftp createNewChannel(ServerConfig selectedItem) throws JSchException {
         Session session = getRootSession(selectedItem);
         ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
         channel.connect();
-        sftpMap.put(selectedItem.getIp(),channel);
         return channel;
     }
 }
