@@ -15,7 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-public class ServerConfig {
+public class ServerConfig implements Cloneable{
 
     private String ip;
     private Integer port;
@@ -31,4 +31,13 @@ public class ServerConfig {
         return StringUtils.isEmpty(别名)?ip:别名;
     }
 
+    @Override
+    public ServerConfig clone()  {
+        try {
+            return (ServerConfig) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

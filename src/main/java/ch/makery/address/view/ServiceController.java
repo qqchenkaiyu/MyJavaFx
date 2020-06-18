@@ -216,12 +216,13 @@ public class ServiceController extends Controller {
                     "ps -ef|grep " + currentService.getServiceName() +
                             " |grep -v grep|awk '{print $2 }'");
             String execResult = rootController.getExecResult(serverConfig,
-                    "jmap -dump:format=b,file=/home/" + serverConfig.getServiceUsername() +
-                            "/下载/heap.bin " + pid);
+                    "su "+serverConfig.getServiceUsername()+" -c 'jmap -dump:format=b,file=/home/" + serverConfig.getServiceUsername() +
+                            "/下载/heap.bin " + pid+"'");
             System.out.println(execResult);
             ChannelSftp channelSftp = rootController.getSftpChannel(serverConfig);
             channelSftp.get("/home/" + serverConfig.getServiceUsername() + "/下载/heap.bin",
-                    currentService.getServiceName() + serverConfig + ".bin");
+                    currentService.getServiceName() + serverConfig.getIp() + ".bin");
+            DialogUtils.AlertInfomation("下载成功！");
 
         }
     }

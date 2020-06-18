@@ -6,6 +6,7 @@ import ch.makery.address.model.ServerConfig;
 import ch.makery.address.util.DialogController;
 import ch.makery.address.util.DialogUtils;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.base.Joiner;
 import com.google.common.collect.EvictingQueue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -23,11 +24,13 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.common.PartitionInfo;
 
 import java.io.File;
 import java.net.Inet4Address;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -192,7 +195,7 @@ public class KafkaClientController extends DialogController {
                 .setPort(Integer.valueOf(kafka客户端端口.getText()));
         String client = kafka客户端命令行位置.getText() + "/kafka-consumer-groups.sh";
         String replaceAll = client.replaceAll("//", "/");
-        mainApp.openEditDialogForResult("查看消费情况","Content.fxml",rootController.getExecResult(serverConfig,
+        mainApp.openEditDialogForResult("查看所有消费组","Content.fxml",rootController.getExecResult(serverConfig,
                 replaceAll + " --bootstrap-server " + kafka集群IP.getText() + " --list"));
     }
 
@@ -216,13 +219,17 @@ mainApp.openEditDialogForResult("查看消费情况","Content.fxml",execResult);
         if (!checkInput()) {
             return;
         }
+        if(kafkaConsumer==null)
+            kafkaConsumer = new KafkaConsumer<String, String>(consumerProperties);
+        Map<String, List<PartitionInfo>> listTopics = kafkaConsumer.listTopics();
+        Joiner joiner = Joiner.on(System.lineSeparator());
+        String join = joiner.join(listTopics.keySet());
         ServerConfig serverConfig = new ServerConfig().setRootUsername(kafka客户端用户名.getText())
                 .setRootPassword(kafka客户端密码.getText()).setIp(kafka客户端IP.getText())
                 .setPort(Integer.valueOf(kafka客户端端口.getText()));
         String client = kafka客户端命令行位置.getText() + "/kafka-topic.sh";
         String replaceAll = client.replaceAll("//", "/");
-        mainApp.openEditDialogForResult("查看消费情况","Content.fxml",getMainApp().getRootController().getExecResult(serverConfig,
-                replaceAll + " --bootstrap-server " + kafka集群IP.getText() + " --list "));
+        mainApp.openEditDialogForResult("查看所有topic","Content.fxml",join);
 
     }
 

@@ -20,17 +20,20 @@ import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -62,10 +65,15 @@ public class RootController extends Controller {
         DialogController controller =
                 mainApp.openEditDialogForResult("添加服务器", "ServerConfig.fxml", serverConfig);
         if(controller.okClicked){
+            try {
+                Session rootSession = getRootSession(serverConfig);
+            }catch (Exception e){
+                DialogUtils.AlertInfomation("无法登陆");
+                return;
+            }
             serverList.getItems().add(serverConfig);
             FileUtil.writeObject(defaultServerConfig,serverList.getItems());
         }
-
     }
     @FXML
     void 打开kafka客户端(ActionEvent event) {
@@ -80,7 +88,7 @@ public class RootController extends Controller {
             DialogUtils.AlertInfomation("必须先选中服务器才能复制");
             return;
         }
-        ServerConfig clone = JSON.parseObject(JSON.toJSONString(serverConfig),ServerConfig.class);
+        ServerConfig clone = serverConfig.clone();
         DialogController controller =
                 mainApp.openEditDialogForResult("复制服务器", "ServerConfig.fxml", clone);
         if(controller.okClicked){
@@ -129,15 +137,27 @@ public class RootController extends Controller {
     @FXML
     void 编辑服务器(ActionEvent event) {
         ServerConfig serverConfig = serverList.getSelectionModel().getSelectedItem();
+        ServerConfig clone = serverConfig.clone();
         if(serverConfig==null){
             DialogUtils.AlertInfomation("必须先选中服务器才能编辑");
             return;
         }
         DialogController controller =
                 mainApp.openEditDialogForResult("编辑服务器", "ServerConfig.fxml", serverConfig);
-        serverList.refresh();
+
         if(controller.isOkClicked()){
+            try {
+                Session rootSession = getRootSession(serverConfig);
+            }catch (Exception e){
+                DialogUtils.AlertInfomation("无法登陆");
+                serverConfig.setRootPassword(clone.getRootPassword());
+                serverConfig.setRootUsername(clone.getRootUsername());
+                serverConfig.setIp(clone.getIp());
+                serverConfig.setPort(clone.getPort());
+                return;
+            }
             FileUtil.writeObject(defaultServerConfig,serverList.getItems());
+            serverList.refresh();
         }
 
     }
@@ -233,7 +253,38 @@ public class RootController extends Controller {
         session.connect();
         return session;
     }
-
+    @SneakyThrows
+    public String getAsyncExecResult(ServerConfig selectedItem,String cmd) {
+        Session session = getRootSession(selectedItem);
+        ChannelShell channel = (ChannelShell) session.openChannel("shell");
+        channel.connect();
+        log.info("执行命令--{}",cmd);
+        channel.connect();
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+        StringBuffer result = new StringBuffer();
+        CompletableFuture.runAsync(() -> {
+                try {
+                    Thread.sleep(200);
+                    BufferedReader bufferedReader = new BufferedReader(
+                            new InputStreamReader(channel.getInputStream(),
+                                    StandardCharsets.UTF_8));
+                    String line;
+                    while ((line=bufferedReader.readLine())!=null){
+                        if(line.contains(selectedItem.getRootUsername()))break;
+                        result.append(line+System.lineSeparator());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            countDownLatch.countDown();
+        });
+        PrintWriter printWriter = new PrintWriter(channel.getOutputStream());
+        printWriter.println(cmd);
+        printWriter.flush();
+        printWriter.close();
+        countDownLatch.await(5, TimeUnit.SECONDS);
+        return result.toString();
+    }
     @SneakyThrows
     public String getExecResult(ServerConfig selectedItem,String cmd) {
         Session session = getRootSession(selectedItem);
@@ -241,7 +292,13 @@ public class RootController extends Controller {
         channel.setCommand(cmd);
         log.info("执行命令--{}",cmd);
         channel.connect();
-        return new String(IOUtils.toByteArray(channel.getInputStream()),StandardCharsets.UTF_8);
+        String result =
+                new String(IOUtils.toByteArray(channel.getInputStream()), StandardCharsets.UTF_8);
+        if(StringUtils.isEmpty(result)){
+            log.error("同步无法获得结果 改为异步");
+            result =getAsyncExecResult(selectedItem,cmd);
+        }
+        return result;
     }
     @SneakyThrows
     public ChannelSftp getSftpChannel(ServerConfig selectedItem) {
