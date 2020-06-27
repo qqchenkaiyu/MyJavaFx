@@ -6,19 +6,20 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 
 public class ContextController extends EditDialogController<Context> {
-        @FXML
-        private TextField 文本编辑器;
-        @FXML
-        private TextField 覆盖率路径;
-        @FXML
-        private TextField 覆盖率命令;
-        @FXML
-        private TextField kafka集群位置;
-        @FXML
-        private TextField kafka客户端位置;
+    @FXML
+    private TextField 文本编辑器;
+    @FXML
+    private TextField 覆盖率路径;
+    @FXML
+    private TextField 覆盖率命令;
+    @FXML
+    private TextField kafka集群位置;
+    @FXML
+    private TextField kafka客户端位置;
+
     @Override
     public boolean isInputValid() {
-    return true;
+        return true;
     }
 
     @Override
@@ -38,4 +39,4 @@ public class ContextController extends EditDialogController<Context> {
         kafka集群位置.setText(obj.getKafkaServers());
         kafka客户端位置.setText(obj.getKafkaBin());
     }
-    }
+}

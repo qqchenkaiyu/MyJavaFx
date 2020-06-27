@@ -45,7 +45,7 @@ public class ServerConfigController extends EditDialogController<ServerConfig> {
         别名.setText(obj.get别名());
         密码.setText(obj.getRootPassword());
         用户名.setText(obj.getRootUsername());
-        端口.setText(obj.getPort()==null?"":obj.getPort().toString());
+        端口.setText(obj.getPort() == null ? "" : obj.getPort().toString());
         服务器地址.setText(obj.getIp());
         进程用户名.setText(obj.getServiceUsername());
     }

@@ -3,18 +3,15 @@ package ch.makery.address.view;
 import ch.makery.address.model.ServiceConfig;
 import ch.makery.address.util.DialogUtils;
 import ch.makery.address.util.EditDialogController;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 
 import java.io.File;
 
-public class EditServerConfigController extends EditDialogController<ServiceConfig>{
+public class EditServerConfigController extends EditDialogController<ServiceConfig> {
 
     @FXML
     private TextField 服务器lib路径;
@@ -35,6 +32,7 @@ public class EditServerConfigController extends EditDialogController<ServiceConf
     private TextField 中文服务名;
     @FXML
     private TextField 压缩包名格式;
+
     @Override
     public boolean isInputValid() {
         return true;
@@ -78,11 +76,11 @@ public class EditServerConfigController extends EditDialogController<ServiceConf
             boolean success = false;
             if (db.hasFiles()) {
                 for (File file : db.getFiles()) {
-                    if(file.isDirectory()){
+                    if (file.isDirectory()) {
                         DialogUtils.AlertInfomation("不能上传文件夹");
                         continue;
                     }
-                    本地换包路径.appendText(file.getAbsolutePath()+";"+System.lineSeparator());
+                    本地换包路径.appendText(file.getAbsolutePath() + ";" + System.lineSeparator());
                 }
                 success = true;
             }

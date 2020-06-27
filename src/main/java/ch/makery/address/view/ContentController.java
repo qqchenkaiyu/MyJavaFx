@@ -1,7 +1,5 @@
 package ch.makery.address.view;
 
-import ch.makery.address.util.Controller;
-import ch.makery.address.util.DialogController;
 import ch.makery.address.util.EditDialogController;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;

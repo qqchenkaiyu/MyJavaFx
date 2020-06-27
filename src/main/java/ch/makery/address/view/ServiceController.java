@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
 import java.util.Optional;
 import java.util.Vector;
 import java.util.concurrent.CompletableFuture;
@@ -66,7 +65,7 @@ public class ServiceController extends Controller {
                     while (channelShell.isConnected()) {
                         try {
                             Thread.sleep(200);
-                            IOUtils.copy(channelShell.getInputStream(),System.out);
+                            IOUtils.copy(channelShell.getInputStream(), System.out);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -87,8 +86,8 @@ public class ServiceController extends Controller {
     public void initController() {
 
         rootController = mainApp.getRootController();
-        String readString = new String(Files.readAllBytes(ServiceConfig.toPath()),StandardCharsets.UTF_8);
-        serviceConfigs=FXCollections
+        String readString = new String(Files.readAllBytes(ServiceConfig.toPath()), StandardCharsets.UTF_8);
+        serviceConfigs = FXCollections
                 .observableArrayList(JSON.parseArray(readString, ServiceConfig.class));
         服务名称.setItems(serviceConfigs);
         服务名称.getSelectionModel().select(0);
@@ -100,7 +99,7 @@ public class ServiceController extends Controller {
                 });
         for (ServiceConfig serviceConfig : serviceConfigs) {
             File file = new File(serviceConfig.getServiceName());
-            if(!file.exists()){
+            if (!file.exists()) {
                 file.mkdir();
             }
         }
@@ -129,19 +128,20 @@ public class ServiceController extends Controller {
     void 配置服务(ActionEvent event) {
         DialogController controller =
                 mainApp.openEditDialogForResult("编辑服务信息", "EditServiceConfig.fxml", currentService);
-        if(controller.isOkClicked()){
-            FileUtil.writeObject(ServiceConfig,serviceConfigs);
+        if (controller.isOkClicked()) {
+            FileUtil.writeObject(ServiceConfig, serviceConfigs);
         }
     }
+
     @FXML
     @SneakyThrows
     void 添加服务(ActionEvent event) {
         ServiceConfig serviceConfig = new ServiceConfig();
         DialogController controller =
                 mainApp.openEditDialogForResult("添加服务信息", "EditServiceConfig.fxml", serviceConfig);
-        if(controller.isOkClicked()){
+        if (controller.isOkClicked()) {
             serviceConfigs.add(serviceConfig);
-            FileUtil.writeObject(ServiceConfig,serviceConfigs);
+            FileUtil.writeObject(ServiceConfig, serviceConfigs);
         }
     }
 
@@ -150,14 +150,14 @@ public class ServiceController extends Controller {
     void 删除服务(ActionEvent event) {
         Optional<ButtonType> buttonType = DialogUtils.AlertConfirm("确定要删除吗?");
         ButtonType buttonType1 = buttonType.get();
-        if(buttonType1.getText().equals("确定")){
+        if (buttonType1.getText().equals("确定")) {
             serviceConfigs.remove(currentService);
-            FileUtil.writeObject(ServiceConfig,serviceConfigs);
+            FileUtil.writeObject(ServiceConfig, serviceConfigs);
         }
 
 
-
     }
+
     @SneakyThrows
     @FXML
     void 采集日志压缩包(ActionEvent event) {
@@ -165,13 +165,14 @@ public class ServiceController extends Controller {
             ChannelSftp channelSftp = rootController.getSftpChannel(serverConfig);
             Vector<ChannelSftp.LsEntry> files = channelSftp.ls(currentService.getLogPath());
             for (ChannelSftp.LsEntry file : files) {
-                if(file.getFilename().contains(currentService.getLoggzPatten())){
-                    channelSftp.get(currentService.getLogPath()+"/"+file.getFilename(),
-                            currentService.getServiceName() +"/"+ serverConfig.getIp()+file.getFilename());
+                if (file.getFilename().contains(currentService.getLoggzPatten())) {
+                    channelSftp.get(currentService.getLogPath() + "/" + file.getFilename(),
+                            currentService.getServiceName() + "/" + serverConfig.getIp() + file.getFilename());
                 }
             }
         }
     }
+
     @FXML
     @SneakyThrows
     void 采集日志(ActionEvent event) {
@@ -179,14 +180,15 @@ public class ServiceController extends Controller {
             ChannelSftp channelSftp = rootController.getSftpChannel(serverConfig);
             Vector<ChannelSftp.LsEntry> files = channelSftp.ls(currentService.getLogPath());
             for (ChannelSftp.LsEntry file : files) {
-                if(file.getFilename().endsWith("log")){
-                    channelSftp.get(currentService.getLogPath()+"/"+file.getFilename(),
-                            currentService.getServiceName() +"/"+ serverConfig.getIp()+file.getFilename());
-                    Runtime.getRuntime().exec(rootController.getContext().getTextEditor()+" " + currentService.getServiceName() +"/"+ serverConfig.getIp()+file.getFilename());
+                if (file.getFilename().endsWith("log")) {
+                    channelSftp.get(currentService.getLogPath() + "/" + file.getFilename(),
+                            currentService.getServiceName() + "/" + serverConfig.getIp() + file.getFilename());
+                    Runtime.getRuntime().exec(rootController.getContext().getTextEditor() + " " + currentService.getServiceName() + "/" + serverConfig.getIp() + file.getFilename());
                 }
             }
         }
     }
+
     @FXML
     @SneakyThrows
     void 上传本地jar包(ActionEvent event) {
@@ -195,24 +197,26 @@ public class ServiceController extends Controller {
             String replaceAll = currentService.getLocalFiles().replaceAll("\\n", "");
             String[] files = replaceAll.split(";");
             for (String s : files) {
-                File file = new File(s.replaceAll(System.lineSeparator(),""));
+                File file = new File(s.replaceAll(System.lineSeparator(), ""));
                 String name = file.getName();
-                if(file.exists()) {
+                if (file.exists()) {
                     channelSftp.put(s, currentService.getRemoteLibDir() + "/" + name);
-                    DialogUtils.AlertInfomation("上传成功"+file.getName());
-                }else {
-                    DialogUtils.AlertInfomation("文件不存在"+file.getName());
+                    DialogUtils.AlertInfomation("上传成功" + file.getName());
+                } else {
+                    DialogUtils.AlertInfomation("文件不存在" + file.getName());
                 }
             }
 
         }
     }
+
     @FXML
     @SneakyThrows
     void 重定义类文件(ActionEvent event) {
         DialogController controller =
                 mainApp.openEditDialogForResult("重定义类文件", "redefineClient.fxml", currentService);
     }
+
     @FXML
     @SneakyThrows
     void 采集堆栈(ActionEvent event) {
@@ -221,8 +225,8 @@ public class ServiceController extends Controller {
                     "ps -ef|grep " + currentService.getServiceName() +
                             " |grep -v grep|awk '{print $2 }'");
             String execResult = rootController.getExecResult(serverConfig,
-                    "su "+serverConfig.getServiceUsername()+" -c 'jmap -dump:format=b,file=/home/" + serverConfig.getServiceUsername() +
-                            "/下载/heap.bin " + pid+"'");
+                    "su " + serverConfig.getServiceUsername() + " -c 'jmap -dump:format=b,file=/home/" + serverConfig.getServiceUsername() +
+                            "/下载/heap.bin " + pid + "'");
             System.out.println(execResult);
             ChannelSftp channelSftp = rootController.getSftpChannel(serverConfig);
             channelSftp.get("/home/" + serverConfig.getServiceUsername() + "/下载/heap.bin",

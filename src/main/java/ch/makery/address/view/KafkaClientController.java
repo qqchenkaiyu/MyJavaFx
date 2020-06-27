@@ -1,11 +1,9 @@
 package ch.makery.address.view;
 
-import ch.makery.address.model.Context;
 import ch.makery.address.model.KafkaConfig;
 import ch.makery.address.model.ServerConfig;
 import ch.makery.address.util.DialogController;
 import ch.makery.address.util.DialogUtils;
-import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Joiner;
 import com.google.common.collect.EvictingQueue;
 import javafx.event.ActionEvent;
@@ -40,13 +38,13 @@ import java.util.stream.Collectors;
 
 @Slf4j
 public class KafkaClientController extends DialogController {
-    private File kafkaConfigFile;
-    private KafkaConfig kafkaConfig;
     KafkaConsumer<String, String> kafkaConsumer;
     EvictingQueue<Object> consumerQueue = EvictingQueue.create(50);
     ExecutorService executorService = Executors.newSingleThreadExecutor();
     KafkaProducer<String, String> kafkaProducer;
     EvictingQueue<Object> producerQueue = EvictingQueue.create(50);
+    private File kafkaConfigFile;
+    private KafkaConfig kafkaConfig;
     @FXML
     private TextArea 收到的消息;
     @FXML
@@ -87,7 +85,7 @@ public class KafkaClientController extends DialogController {
         kafkaConfig.setRootPassword(kafka客户端密码.getText());
         kafkaConfig.setRootUsername(kafka客户端用户名.getText());
         kafkaConfig.setGroup(特定组.getText());
-        FileUtil.writeObject(kafkaConfigFile,kafkaConfig);
+        FileUtil.writeObject(kafkaConfigFile, kafkaConfig);
     }
 
     @FXML
@@ -107,8 +105,8 @@ public class KafkaClientController extends DialogController {
         stop = true;
         executorService.execute(() -> {
             stop = false;
-            if(kafkaConsumer==null)
-            kafkaConsumer = new KafkaConsumer<String, String>(consumerProperties);
+            if (kafkaConsumer == null)
+                kafkaConsumer = new KafkaConsumer<String, String>(consumerProperties);
             kafkaConsumer.subscribe(topicList);
             while (!stop) {
                 ConsumerRecords<String, String> records = kafkaConsumer.poll(1000);
@@ -120,7 +118,7 @@ public class KafkaClientController extends DialogController {
                 }
             }
             kafkaConsumer.close();
-            kafkaConsumer=null;
+            kafkaConsumer = null;
         });
     }
 
@@ -128,7 +126,7 @@ public class KafkaClientController extends DialogController {
     @Override
     public void initController() {
         String dir = System.getProperty("user.dir");
-        kafkaConfigFile =new File(dir+"/"+"kafkaConfig.json");
+        kafkaConfigFile = new File(dir + "/" + "kafkaConfig.json");
         kafkaConfig = FileUtil.readObject(kafkaConfigFile, KafkaConfig.class);
         kafka集群IP.setText(kafkaConfig.getClustip());
         kafka客户端IP.setText(kafkaConfig.getIp());
@@ -160,7 +158,7 @@ public class KafkaClientController extends DialogController {
         dialogStage.setOnCloseRequest((event) -> {
             stop = true;
             kafkaProducer.close();
-            kafkaProducer=null;
+            kafkaProducer = null;
             executorService.shutdown();
         });
     }
@@ -195,7 +193,7 @@ public class KafkaClientController extends DialogController {
                 .setPort(Integer.valueOf(kafka客户端端口.getText()));
         String client = kafka客户端命令行位置.getText() + "/kafka-consumer-groups.sh";
         String replaceAll = client.replaceAll("//", "/");
-        mainApp.openEditDialogForResult("查看所有消费组","Content.fxml",rootController.getExecResult(serverConfig,
+        mainApp.openEditDialogForResult("查看所有消费组", "Content.fxml", rootController.getExecResult(serverConfig,
                 replaceAll + " --bootstrap-server " + kafka集群IP.getText() + " --list"));
     }
 
@@ -210,7 +208,7 @@ public class KafkaClientController extends DialogController {
         String execResult = rootController.getExecResult(serverConfig,
                 replaceAll + " --bootstrap-server " + kafka集群IP.getText() + " --describe --group " +
                         特定组.getText());
-mainApp.openEditDialogForResult("查看消费情况","Content.fxml",execResult);
+        mainApp.openEditDialogForResult("查看消费情况", "Content.fxml", execResult);
 
     }
 
@@ -219,12 +217,12 @@ mainApp.openEditDialogForResult("查看消费情况","Content.fxml",execResult);
         if (!checkInput()) {
             return;
         }
-        if(kafkaConsumer==null)
+        if (kafkaConsumer == null)
             kafkaConsumer = new KafkaConsumer<String, String>(consumerProperties);
         Map<String, List<PartitionInfo>> listTopics = kafkaConsumer.listTopics();
         Joiner joiner = Joiner.on(System.lineSeparator());
         String join = joiner.join(listTopics.keySet());
-        mainApp.openEditDialogForResult("查看所有topic","Content.fxml",join);
+        mainApp.openEditDialogForResult("查看所有topic", "Content.fxml", join);
 
     }
 
