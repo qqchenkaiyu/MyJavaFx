@@ -87,7 +87,7 @@ public class ServiceController extends Controller {
     public void initController() {
 
         rootController = mainApp.getRootController();
-        String readString = new String(Files.readAllBytes(ServiceConfig.toPath()));
+        String readString = new String(Files.readAllBytes(ServiceConfig.toPath()),StandardCharsets.UTF_8);
         serviceConfigs=FXCollections
                 .observableArrayList(JSON.parseArray(readString, ServiceConfig.class));
         服务名称.setItems(serviceConfigs);
@@ -207,7 +207,12 @@ public class ServiceController extends Controller {
 
         }
     }
-
+    @FXML
+    @SneakyThrows
+    void 重定义类文件(ActionEvent event) {
+        DialogController controller =
+                mainApp.openEditDialogForResult("重定义类文件", "redefineClient.fxml", currentService);
+    }
     @FXML
     @SneakyThrows
     void 采集堆栈(ActionEvent event) {

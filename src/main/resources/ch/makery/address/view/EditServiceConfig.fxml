@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<AnchorPane prefHeight="650.0" prefWidth="609.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.makery.address.view.EditServerConfigController">
+<AnchorPane prefHeight="725.0" prefWidth="596.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ch.makery.address.view.EditServerConfigController">
    <children>
       <Label layoutX="84.0" layoutY="401.0" text="服务名:" />
       <Label layoutX="74.0" layoutY="104.0" text="日志路径:" />

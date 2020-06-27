@@ -14,10 +14,14 @@ import java.util.List;
 public class FileUtil {
     @SneakyThrows
     public static void writeObject(File file, Object object){
+        writeContent(file,JSON.toJSONString(object));
+           }
+    @SneakyThrows
+    public static void writeContent(File file, String str){
         Path path = file.toPath();
         Files.deleteIfExists(path);
         file.createNewFile();
-        Files.write(path, JSON.toJSONString(object).getBytes(StandardCharsets.UTF_8), StandardOpenOption.WRITE);
+        Files.write(path, str.getBytes(StandardCharsets.UTF_8), StandardOpenOption.WRITE);
     }
     @SneakyThrows
     public static <T> T readObject(File file, Class<T> clazz){

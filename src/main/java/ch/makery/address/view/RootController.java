@@ -28,6 +28,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Vector;
@@ -287,6 +288,16 @@ public class RootController extends Controller {
     }
     @SneakyThrows
     public String getExecResult(ServerConfig selectedItem,String cmd) {
+        String result =
+                ExecShell(selectedItem,cmd);
+        if(StringUtils.isEmpty(result)){
+            log.error("同步无法获得结果 改为异步");
+            result =getAsyncExecResult(selectedItem,cmd);
+        }
+        return result;
+    }
+    @SneakyThrows
+    public String ExecShell(ServerConfig selectedItem,String cmd) {
         Session session = getRootSession(selectedItem);
         ChannelExec channel = (ChannelExec) session.openChannel("exec");
         channel.setCommand(cmd);
@@ -294,10 +305,6 @@ public class RootController extends Controller {
         channel.connect();
         String result =
                 new String(IOUtils.toByteArray(channel.getInputStream()), StandardCharsets.UTF_8);
-        if(StringUtils.isEmpty(result)){
-            log.error("同步无法获得结果 改为异步");
-            result =getAsyncExecResult(selectedItem,cmd);
-        }
         return result;
     }
     @SneakyThrows
@@ -310,5 +317,39 @@ public class RootController extends Controller {
         ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
         channel.connect();
         return channel;
+    }
+public boolean isFileExist(ChannelSftp sftpChannel,String path){
+        try {
+            SftpATTRS lstat = sftpChannel.lstat(path);
+            return true;
+        }catch (Exception e){
+            return false;
+        }
+}
+    public  void recursiveDelete(ChannelSftp sftp, String path)
+            throws SftpException {
+        Vector<?> entries = sftp.ls(path);
+        for (Object object : entries) {
+            ChannelSftp.LsEntry entry = (ChannelSftp.LsEntry) object;
+            if (entry.getFilename().equals(".")
+                    || entry.getFilename().equals("..")) {
+                continue;
+            }
+            if (entry.getAttrs().isDir()) {
+                recursiveDelete(sftp, path + entry.getFilename() + "/");
+            } else {
+                sftp.rm(path + entry.getFilename());
+            }
+        }
+        sftp.rmdir(path);
+    }
+
+    public static void main(String[] args) throws SftpException {
+        ChannelSftp sftpChannel = new RootController().getSftpChannel(new ServerConfig("192.168.208.128", 22, "虚拟机192.168.208.128", "chenkaiyu", "root", "qq634691", null));
+        String targetDir="\\home\\chenkaiyu\\com\\example\\demo";
+        targetDir= targetDir.replaceAll("\\\\","/");
+        sftpChannel.put("F://test/com/example/demo/BBking.java",targetDir);
+        SftpATTRS lstat = sftpChannel.lstat(targetDir + "/" + "BBking.java");
+        System.out.println(lstat);
     }
 }

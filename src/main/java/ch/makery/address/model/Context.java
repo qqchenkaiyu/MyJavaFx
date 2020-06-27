@@ -18,4 +18,6 @@ public class Context {
     private String kafkaServers="192.168.99.100:9092";
     @ChineseName("kafka客户端位置")
     private String kafkaBin="";
+    @ChineseName("重定义地址")
+    private String redefinePath="F://test";
 }

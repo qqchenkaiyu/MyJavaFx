@@ -224,11 +224,6 @@ mainApp.openEditDialogForResult("查看消费情况","Content.fxml",execResult);
         Map<String, List<PartitionInfo>> listTopics = kafkaConsumer.listTopics();
         Joiner joiner = Joiner.on(System.lineSeparator());
         String join = joiner.join(listTopics.keySet());
-        ServerConfig serverConfig = new ServerConfig().setRootUsername(kafka客户端用户名.getText())
-                .setRootPassword(kafka客户端密码.getText()).setIp(kafka客户端IP.getText())
-                .setPort(Integer.valueOf(kafka客户端端口.getText()));
-        String client = kafka客户端命令行位置.getText() + "/kafka-topic.sh";
-        String replaceAll = client.replaceAll("//", "/");
         mainApp.openEditDialogForResult("查看所有topic","Content.fxml",join);
 
     }

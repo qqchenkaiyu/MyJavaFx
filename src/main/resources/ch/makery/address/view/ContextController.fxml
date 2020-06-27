@@ -21,6 +21,7 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
                <TextField fx:id="文本编辑器" GridPane.columnIndex="1" GridPane.rowIndex="0">
@@ -73,6 +74,16 @@
                      <Insets left="22.0" />
                   </GridPane.margin>
                </Label>
+            <Label text="重定义地址" GridPane.rowIndex="5">
+               <GridPane.margin>
+                  <Insets left="22.0" />
+               </GridPane.margin>
+            </Label>
+            <TextField fx:id="重定义地址" GridPane.columnIndex="1" GridPane.rowIndex="5">
+               <GridPane.margin>
+                  <Insets left="20.0" right="20.0" />
+               </GridPane.margin>
+            </TextField>
          </children>
       </GridPane>
       <HBox layoutX="411.0" layoutY="258.0" prefHeight="37.0" prefWidth="143.0" spacing="20.0" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0">

@@ -37,6 +37,7 @@ public class ServerConfigController extends EditDialogController<ServerConfig> {
         obj.setPort(Integer.valueOf(端口.getText()));
         obj.setRootUsername(用户名.getText());
         obj.setServiceUsername(进程用户名.getText());
+
     }
 
     @Override
