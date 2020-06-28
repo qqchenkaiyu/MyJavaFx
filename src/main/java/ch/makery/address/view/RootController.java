@@ -283,7 +283,6 @@ public class RootController extends Controller {
         ChannelShell channel = (ChannelShell) session.openChannel("shell");
         channel.connect();
         log.info("执行命令--{}", cmd);
-        channel.connect();
         CountDownLatch countDownLatch = new CountDownLatch(1);
         StringBuffer result = new StringBuffer();
         CompletableFuture.runAsync(() -> {
