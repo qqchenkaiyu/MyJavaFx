@@ -16,7 +16,8 @@ public class ContextController extends EditDialogController<Context> {
     private TextField kafka集群位置;
     @FXML
     private TextField kafka客户端位置;
-
+ @FXML
+    private TextField 重定义地址;
     @Override
     public boolean isInputValid() {
         return true;
@@ -29,6 +30,7 @@ public class ContextController extends EditDialogController<Context> {
         obj.setCoverageCmd(覆盖率命令.getText());
         obj.setKafkaServers(kafka集群位置.getText());
         obj.setKafkaBin(kafka客户端位置.getText());
+         obj.setRedefinePath(重定义地址.getText());
     }
 
     @Override
@@ -38,5 +40,6 @@ public class ContextController extends EditDialogController<Context> {
         覆盖率命令.setText(obj.getCoverageCmd());
         kafka集群位置.setText(obj.getKafkaServers());
         kafka客户端位置.setText(obj.getKafkaBin());
+         重定义地址.setText(obj.getRedefinePath());
     }
 }
