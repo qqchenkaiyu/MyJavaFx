@@ -49,6 +49,7 @@ public class RedefineClientController extends EditDialogController<ServiceConfig
             sftpChannel = rootController.getSftpChannel(serverConfig);
         if (!rootController.isFileExist(sftpChannel, linuxAgent)) {
             sftpChannel.put(agentpath, userhomeRedifine);
+            sftpChannel.chmod(Integer.parseInt("777", 8), linuxAgent);
             if (!rootController.isFileExist(sftpChannel, linuxAgent)) {
                 DialogUtils.AlertInfomation("上传 agent 失败");
                 return;
@@ -82,6 +83,7 @@ public class RedefineClientController extends EditDialogController<ServiceConfig
             sftpChannel = rootController.getSftpChannel(serverConfig);
         if (!rootController.isFileExist(sftpChannel, linuxAgent)) {
             sftpChannel.put(agentpath, userhomeRedifine);
+            sftpChannel.chmod(Integer.parseInt("777", 8), linuxAgent);
             if (!rootController.isFileExist(sftpChannel, linuxAgent)) {
                 DialogUtils.AlertInfomation("上传 agent 失败");
                 return;
@@ -126,7 +128,7 @@ public class RedefineClientController extends EditDialogController<ServiceConfig
         }
         agentfile = "redefineAgent-1.0-SNAPSHOT.jar";
         linuxAgent = userhomeRedifine + "/" + agentfile;
-        preCmd = "cd " + userhomeRedifine + ";su " + serverConfig.getServiceUsername() + " -c  'java -jar " + agentfile + " attach " + obj.getServiceName() + "  " + linuxAgent;
+        preCmd ="su - " + serverConfig.getServiceUsername() + " -c  'cd " + userhomeRedifine + ";java -jar " + agentfile + " attach " + obj.getServiceName() + "  " + linuxAgent;
         dialogStage.setOnCloseRequest((event) -> {
             if (sftpChannel != null && sftpChannel.isConnected()) {
                 try {
