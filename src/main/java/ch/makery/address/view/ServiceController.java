@@ -223,7 +223,7 @@ public class ServiceController extends Controller {
         for (ServerConfig serverConfig : rootController.getSelectedServerConfigs()) {
              String pid = rootController.getExecResult(serverConfig,
                     "ps -ef|grep " + currentService.getServiceName() +
-                            " |grep -v grep|awk '{print $2 }'");
+                            " |grep -v grep|awk '{print $2 }'").replaceAll("\n","");;
             String path="/home/" + serverConfig.getServiceUsername() +
             "/heap.bin";
             String execResult = rootController.ExecShell(serverConfig,
