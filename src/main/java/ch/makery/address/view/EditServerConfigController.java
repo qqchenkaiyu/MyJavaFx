@@ -16,8 +16,6 @@ public class EditServerConfigController extends EditDialogController<ServiceConf
     @FXML
     private TextField 服务器lib路径;
     @FXML
-    private TextField 重定义地址;
-    @FXML
     private TextField 服务名;
 
     @FXML
@@ -48,12 +46,10 @@ public class EditServerConfigController extends EditDialogController<ServiceConf
         obj.setStartCmd(启动命令.getText());
         obj.setStopCmd(停止命令.getText());
         obj.setLoggzPatten(压缩包名格式.getText());
-        obj.setRedefinePath(重定义地址.getText());
     }
 
     @Override
     public void initController() {
-        重定义地址.setText(obj.getRedefinePath());
         中文服务名.setText(obj.getDisplayName());
         日志路径.setText(obj.getLogPath());
         服务名.setText(obj.getServiceName());
