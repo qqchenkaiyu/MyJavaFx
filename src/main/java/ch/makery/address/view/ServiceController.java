@@ -221,15 +221,21 @@ public class ServiceController extends Controller {
     @SneakyThrows
     void 采集堆栈(ActionEvent event) {
         for (ServerConfig serverConfig : rootController.getSelectedServerConfigs()) {
-            String pid = rootController.getExecResult(serverConfig,
+             String pid = rootController.getExecResult(serverConfig,
                     "ps -ef|grep " + currentService.getServiceName() +
                             " |grep -v grep|awk '{print $2 }'");
-            String execResult = rootController.getExecResult(serverConfig,
-                    "su " + serverConfig.getServiceUsername() + " -c 'jmap -dump:format=b,file=/home/" + serverConfig.getServiceUsername() +
-                            "/下载/heap.bin " + pid + "'");
+            String path="/home/" + serverConfig.getServiceUsername() +
+            "/heap.bin";
+            String execResult = rootController.ExecShell(serverConfig,
+                    "su - " + serverConfig.getServiceUsername() + " -c 'jmap -dump:format=b,file="+path+" " + pid + "'");
             System.out.println(execResult);
             ChannelSftp channelSftp = rootController.getSftpChannel(serverConfig);
-            channelSftp.get("/home/" + serverConfig.getServiceUsername() + "/下载/heap.bin",
+            if(!rootController.isFileExist(channelSftp,path)){
+                DialogUtils.AlertInfomation("生成dump文件失败");
+                return;
+            }
+
+            channelSftp.get(path,
                     currentService.getServiceName() + serverConfig.getIp() + ".bin");
             DialogUtils.AlertInfomation("下载成功！");
 
