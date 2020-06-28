@@ -189,7 +189,7 @@ public class ServiceController extends Controller {
         }
     }
 
-    @FXML
+@FXML
     @SneakyThrows
     void 上传本地jar包(ActionEvent event) {
         for (ServerConfig serverConfig : rootController.getSelectedServerConfigs()) {
@@ -200,6 +200,7 @@ public class ServiceController extends Controller {
                 File file = new File(s.replaceAll(System.lineSeparator(), ""));
                 String name = file.getName();
                 if (file.exists()) {
+                    channelSftp.rename(currentService.getRemoteLibDir() + "/" + name,currentService.getRemoteLibDir() + "/" + name+".bak"+System.currentTimeMillis());
                     channelSftp.put(s, currentService.getRemoteLibDir() + "/" + name);
                     DialogUtils.AlertInfomation("上传成功" + file.getName());
                 } else {
