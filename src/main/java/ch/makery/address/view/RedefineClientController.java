@@ -53,6 +53,8 @@ public class RedefineClientController extends EditDialogController<ServiceConfig
             DialogUtils.AlertInfomation("全类名 不能为空");
             return;
         }
+        rootController.getContext().setLatestClass(全类名.getText());
+        FileUtil.writeObject(rootController.getPreferFile(),rootController.getContext());
         if (sftpChannel == null || !sftpChannel.isConnected())
             sftpChannel = rootController.getSftpChannel(serverConfig);
         if (!rootController.isFileExist(sftpChannel, linuxAgent)) {
@@ -135,6 +137,7 @@ public class RedefineClientController extends EditDialogController<ServiceConfig
             log.error("agent 文件不存在");
             return;
         }
+        全类名.setText(rootController.getContext().getLatestClass());
         输出地址.setText(rootController.getContext().getRedefinePath());
         Optional<ServerConfig> first = rootController.getSelectedServerConfigs().stream().findFirst();
         serverConfig = first.get();
