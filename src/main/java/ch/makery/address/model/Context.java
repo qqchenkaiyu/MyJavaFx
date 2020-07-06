@@ -20,4 +20,5 @@ public class Context {
     private String kafkaBin = "";
     @ChineseName("重定义地址")
     private String redefinePath = "F://test";
+    private String LatestClass = "com.hello";
 }
