@@ -119,8 +119,7 @@ public class RedefineClientController extends EditDialogController<ServiceConfig
             return;
         }
         String cmd = preCmd +
-                " redefine " + linuxJavaPath + " " + userhomeRedifine + "'";
-        ;
+                " redefine " + linuxJavaPath + " " + userhomeRedifine+ " " +obj.getRemoteLibDir() + "'";
         String result = rootController.ExecShell(serverConfig, cmd);
         DialogUtils.AlertInfomation(result);
     }
