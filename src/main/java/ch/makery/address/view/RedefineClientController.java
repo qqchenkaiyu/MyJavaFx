@@ -78,7 +78,7 @@ public class RedefineClientController extends EditDialogController<ServiceConfig
         }
         new File(输出地址.getText() + "/" + classpath).getParentFile().mkdirs();
         sftpChannel.get(linuxClassPath, 输出地址.getText() + "/" + classpath);
-        String compilecmd ="java -DAnsi=true -jar decompiler.jar "+输出地址.getText() + "/" + classpath+" -o "+输出地址.getText();
+        String compilecmd ="java  -jar decompiler.jar "+输出地址.getText() + "/" + classpath+" --outputdir "+输出地址.getText();
         Process ps = Runtime.getRuntime().exec(compilecmd);
         boolean status = ps.waitFor(2, TimeUnit.SECONDS);
         IOUtils.copy(new InputStreamReader(ps.getInputStream(), StandardCharsets.UTF_8), System.out);
@@ -87,7 +87,9 @@ public class RedefineClientController extends EditDialogController<ServiceConfig
             return;
         }
         String context = new String(Files.readAllBytes(Paths.get(localjavapath)));
-        类文件内容.setText(context);
+        String unicodeStr2String = StringUnicodeUtil.unicodeStr2String(context);
+        FileUtil.writeContent(new File(localjavapath), unicodeStr2String);
+        类文件内容.setText(unicodeStr2String);
     }
 
     @SneakyThrows
@@ -129,7 +131,6 @@ public class RedefineClientController extends EditDialogController<ServiceConfig
     public void initController() {
 
         rootController = getMainApp().getRootController();
-        // 输出地址.setText(context.getTextEditor());
         String jarpath = System.getProperty("user.dir");
         agentpath = jarpath + "\\redefineAgent-1.0-SNAPSHOT.jar";
         if (!new File(agentpath).exists()) {
