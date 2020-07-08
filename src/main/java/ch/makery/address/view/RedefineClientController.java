@@ -1,5 +1,7 @@
 package ch.makery.address.view;
 
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.text.UnicodeUtil;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.SftpException;
 
@@ -87,7 +89,7 @@ public class RedefineClientController extends EditDialogController<ServiceConfig
             return;
         }
         String context = new String(Files.readAllBytes(Paths.get(localjavapath)));
-        String unicodeStr2String = StringUnicodeUtil.unicodeStr2String(context);
+        String unicodeStr2String = UnicodeUtil.toString(context);
         FileUtil.writeContent(new File(localjavapath), unicodeStr2String);
         类文件内容.setText(unicodeStr2String);
     }
