@@ -1,9 +1,11 @@
 package ch.makery.address.view;
 
 import ch.makery.address.model.KafkaConfig;
-import ch.makery.address.model.ServerConfig;
+import ch.makery.address.model.MyServerConfig;
 import ch.makery.address.util.DialogController;
 import ch.makery.address.util.DialogUtils;
+import com.cky.jsch.JschUtil;
+import com.cky.jsch.ServerConfig;
 import com.google.common.base.Joiner;
 import com.google.common.collect.EvictingQueue;
 import javafx.event.ActionEvent;
@@ -188,12 +190,12 @@ public class KafkaClientController extends DialogController {
     @FXML
     void 查看所有消费组(ActionEvent event) {
         RootController rootController = getMainApp().getRootController();
-        ServerConfig serverConfig = new ServerConfig().setRootUsername(kafka客户端用户名.getText())
+        ServerConfig serverConfig = new MyServerConfig().setRootUsername(kafka客户端用户名.getText())
                 .setRootPassword(kafka客户端密码.getText()).setIp(kafka客户端IP.getText())
                 .setPort(Integer.valueOf(kafka客户端端口.getText()));
         String client = kafka客户端命令行位置.getText() + "/kafka-consumer-groups.sh";
         String replaceAll = client.replaceAll("//", "/");
-        mainApp.openEditDialogForResult("查看所有消费组", "Content.fxml", rootController.getExecResult(serverConfig,
+        mainApp.openEditDialogForResult("查看所有消费组", "Content.fxml", JschUtil.getExecResult(serverConfig,
                 replaceAll + " --bootstrap-server " + kafka集群IP.getText() + " --list"));
     }
 
@@ -205,7 +207,7 @@ public class KafkaClientController extends DialogController {
                 .setPort(Integer.valueOf(kafka客户端端口.getText()));
         String client = kafka客户端命令行位置.getText() + "/kafka-consumer-groups.sh";
         String replaceAll = client.replaceAll("//", "/");
-        String execResult = rootController.getExecResult(serverConfig,
+        String execResult = JschUtil.getExecResult(serverConfig,
                 replaceAll + " --bootstrap-server " + kafka集群IP.getText() + " --describe --group " +
                         特定组.getText());
         mainApp.openEditDialogForResult("查看消费情况", "Content.fxml", execResult);

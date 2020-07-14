@@ -1,12 +1,12 @@
 package ch.makery.address.view;
 
 
-import ch.makery.address.model.ServerConfig;
+import ch.makery.address.model.MyServerConfig;
 import ch.makery.address.util.EditDialogController;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 
-public class ServerConfigController extends EditDialogController<ServerConfig> {
+public class ServerConfigController extends EditDialogController<MyServerConfig> {
 
     @FXML
     private TextField 密码;
@@ -31,7 +31,7 @@ public class ServerConfigController extends EditDialogController<ServerConfig> {
 
     @Override
     public void save() {
-        obj.set别名(别名.getText());
+        obj.setAlias(别名.getText());
         obj.setIp(服务器地址.getText());
         obj.setRootPassword(密码.getText());
         obj.setPort(Integer.valueOf(端口.getText()));
@@ -42,7 +42,7 @@ public class ServerConfigController extends EditDialogController<ServerConfig> {
 
     @Override
     public void initController() {
-        别名.setText(obj.get别名());
+        别名.setText(obj.getAlias());
         密码.setText(obj.getRootPassword());
         用户名.setText(obj.getRootUsername());
         端口.setText(obj.getPort() == null ? "" : obj.getPort().toString());

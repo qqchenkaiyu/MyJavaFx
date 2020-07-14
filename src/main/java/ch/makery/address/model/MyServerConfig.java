@@ -1,5 +1,6 @@
 package ch.makery.address.model;
 
+import com.cky.jsch.ServerConfig;
 import javafx.beans.property.SimpleBooleanProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,29 +19,13 @@ import org.apache.commons.lang3.StringUtils;
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-public class ServerConfig implements Cloneable {
+public class MyServerConfig extends ServerConfig  {
 
-    private String ip;
-    private Integer port;
-    private String 别名;
-    private String serviceUsername;
-    private String rootUsername;
-    private String rootPassword;
     private SimpleBooleanProperty selected = new SimpleBooleanProperty();
-
 
     @Override
     public String toString() {
-        return StringUtils.isEmpty(别名) ? ip : 别名;
+        return StringUtils.isEmpty(alias) ? ip : alias;
     }
 
-    @Override
-    public ServerConfig clone() {
-        try {
-            return (ServerConfig) super.clone();
-        } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 }

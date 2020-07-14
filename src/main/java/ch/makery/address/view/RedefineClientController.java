@@ -1,11 +1,11 @@
 package ch.makery.address.view;
 
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.text.UnicodeUtil;
+import com.cky.jsch.JschUtil;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.SftpException;
 
-import ch.makery.address.model.ServerConfig;
+import ch.makery.address.model.MyServerConfig;
 import ch.makery.address.model.ServiceConfig;
 import ch.makery.address.util.DialogUtils;
 import ch.makery.address.util.EditDialogController;
@@ -44,7 +44,7 @@ public class RedefineClientController extends EditDialogController<ServiceConfig
     private String linuxJavaPath;
     private String linuxClassPath;
     private String preCmd;
-    private ServerConfig serverConfig;
+    private MyServerConfig serverConfig;
     private ChannelSftp sftpChannel;
 
     @SneakyThrows
@@ -58,23 +58,23 @@ public class RedefineClientController extends EditDialogController<ServiceConfig
         rootController.getContext().setLatestClass(全类名.getText());
         FileUtil.writeObject(rootController.getPreferFile(),rootController.getContext());
         if (sftpChannel == null || !sftpChannel.isConnected())
-            sftpChannel = rootController.getSftpChannel(serverConfig);
-        if (!rootController.isFileExist(sftpChannel, linuxAgent)) {
+            sftpChannel = JschUtil.getSftpChannel(serverConfig);
+        if (!JschUtil.isFileExist(sftpChannel, linuxAgent)) {
             sftpChannel.put(agentpath, userhomeRedifine);
             sftpChannel.chmod(Integer.parseInt("777", 8), linuxAgent);
-            if (!rootController.isFileExist(sftpChannel, linuxAgent)) {
+            if (!JschUtil.isFileExist(sftpChannel, linuxAgent)) {
                 DialogUtils.AlertInfomation("上传 agent 失败");
                 return;
             }
         }
         String cmd = preCmd +
                 " compile " + 全类名.getText() + " " + userhomeRedifine + "'";
-        rootController.ExecShell(serverConfig, cmd);
+        JschUtil.ExecShell(serverConfig, cmd);
         String classpath = 全类名.getText().replaceAll("\\.", "/") + ".class";
         linuxClassPath = userhomeRedifine + "/" + classpath;
         String javapath = 全类名.getText().replaceAll("\\.", "/") + ".java";
         String localjavapath = 输出地址.getText() + "/" + javapath;
-        if (!rootController.isFileExist(sftpChannel, linuxClassPath)) {
+        if (!JschUtil.isFileExist(sftpChannel, linuxClassPath)) {
             DialogUtils.AlertInfomation("生成class文件 失败"+linuxClassPath);
             return;
         }
@@ -104,11 +104,11 @@ public class RedefineClientController extends EditDialogController<ServiceConfig
         String javapath = 全类名.getText().replaceAll("\\.", "/") + ".java";
         linuxJavaPath = userhomeRedifine + "/" + javapath;
         if (sftpChannel == null || !sftpChannel.isConnected())
-            sftpChannel = rootController.getSftpChannel(serverConfig);
-        if (!rootController.isFileExist(sftpChannel, linuxAgent)) {
+            sftpChannel = JschUtil.getSftpChannel(serverConfig);
+        if (!JschUtil.isFileExist(sftpChannel, linuxAgent)) {
             sftpChannel.put(agentpath, userhomeRedifine);
             sftpChannel.chmod(Integer.parseInt("777", 8), linuxAgent);
-            if (!rootController.isFileExist(sftpChannel, linuxAgent)) {
+            if (!JschUtil.isFileExist(sftpChannel, linuxAgent)) {
                 DialogUtils.AlertInfomation("上传 agent 失败");
                 return;
             }
@@ -118,13 +118,13 @@ public class RedefineClientController extends EditDialogController<ServiceConfig
         log.info("上传 {}到 {}", 输出地址.getText() + "/" + javapath, parent);
         sftpChannel.put(输出地址.getText() + "/" + javapath, parent);
         sftpChannel.chmod(Integer.parseInt("777", 8), linuxJavaPath);
-        if (!rootController.isFileExist(sftpChannel, linuxJavaPath)) {
+        if (!JschUtil.isFileExist(sftpChannel, linuxJavaPath)) {
             DialogUtils.AlertInfomation("上传java文件 失败");
             return;
         }
         String cmd = preCmd +
                 " redefine " + linuxJavaPath + " " + userhomeRedifine+ " " +obj.getRemoteLibDir() + "'";
-        String result = rootController.ExecShell(serverConfig, cmd);
+        String result = JschUtil.ExecShell(serverConfig, cmd);
         DialogUtils.AlertInfomation(result);
     }
 
@@ -141,26 +141,26 @@ public class RedefineClientController extends EditDialogController<ServiceConfig
         }
         全类名.setText(rootController.getContext().getLatestClass());
         输出地址.setText(rootController.getContext().getRedefinePath());
-        Optional<ServerConfig> first = rootController.getSelectedServerConfigs().stream().findFirst();
+        Optional<MyServerConfig> first = rootController.getSelectedServerConfigs().stream().findFirst();
         serverConfig = first.get();
         userhome = "/home/" + serverConfig.getServiceUsername();
         userhomeRedifine = userhome + "/redefine";
-        sftpChannel = rootController.getSftpChannel(serverConfig);
-        if (!rootController.isFileExist(sftpChannel, userhomeRedifine)) {
+        sftpChannel = JschUtil.getSftpChannel(serverConfig);
+        if (!JschUtil.isFileExist(sftpChannel, userhomeRedifine)) {
             sftpChannel.mkdir(userhomeRedifine);
             sftpChannel.chmod(Integer.parseInt("777", 8), userhomeRedifine);
         }
         agentfile = "redefineAgent-1.0-SNAPSHOT.jar";
         linuxAgent = userhomeRedifine + "/" + agentfile;
-        String pid = rootController.getExecResult(serverConfig,
+        String pid = JschUtil.getExecResult(serverConfig,
             "ps -ef|grep " + obj.getServiceName() +
                 " |grep -v grep|awk '{print $2 }'").replaceAll("\n","");
         preCmd ="su - " + serverConfig.getServiceUsername() + " -c  'cd " + userhomeRedifine + ";java -jar " + agentfile + " attach " + pid + "  " + linuxAgent;
         dialogStage.setOnCloseRequest((event) -> {
             if (sftpChannel != null && sftpChannel.isConnected()) {
                 try {
-                    if (rootController.isFileExist(sftpChannel, userhomeRedifine)) {
-                        rootController.recursiveDelete(sftpChannel, userhomeRedifine + "/");
+                    if (JschUtil.isFileExist(sftpChannel, userhomeRedifine)) {
+                        JschUtil.recursiveDelete(sftpChannel, userhomeRedifine + "/");
                         DialogUtils.AlertInfomation("删除临时文件成功");
                     }
 

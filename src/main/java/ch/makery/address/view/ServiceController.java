@@ -1,11 +1,12 @@
 package ch.makery.address.view;
 
-import ch.makery.address.model.ServerConfig;
+import ch.makery.address.model.MyServerConfig;
 import ch.makery.address.model.ServiceConfig;
 import ch.makery.address.util.Controller;
 import ch.makery.address.util.DialogController;
 import ch.makery.address.util.DialogUtils;
 import com.alibaba.fastjson.JSON;
+import com.cky.jsch.JschUtil;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.ChannelShell;
 import com.jcraft.jsch.Session;
@@ -44,13 +45,13 @@ public class ServiceController extends Controller {
 
     @FXML
     void 抓包开始(ActionEvent event) throws Exception {
-        for (ServerConfig serverConfig : rootController.getSelectedServerConfigs()) {
+        for (MyServerConfig serverConfig : rootController.getSelectedServerConfigs()) {
             if (isCapturing) {
                 printWriter.println("exit");
                 printWriter.flush();
                 printWriter.close();
                 channelShell.disconnect();
-                ChannelSftp channelSftp = rootController.getSftpChannel(serverConfig);
+                ChannelSftp channelSftp = JschUtil.getSftpChannel(serverConfig);
                 channelSftp.get("/root/抓包.cap",
                         currentService.getServiceName() + ".cap");
                 isCapturing = false;
@@ -58,7 +59,7 @@ public class ServiceController extends Controller {
                 DialogUtils.AlertInfomation("抓包完成");
             } else {
                 isCapturing = true;
-                Session rootSession = rootController.getRootSession(serverConfig);
+                Session rootSession = JschUtil.getRootSession(serverConfig);
                 channelShell = (ChannelShell) rootSession.openChannel("shell");
                 channelShell.connect();
                 CompletableFuture.runAsync(() -> {
@@ -109,7 +110,7 @@ public class ServiceController extends Controller {
     @FXML
     void 启动服务(ActionEvent event) {
         rootController.getSelectedServerConfigs().stream().forEach(serverConfig -> {
-            String res = rootController.getExecResult(serverConfig,
+            String res = JschUtil.getExecResult(serverConfig,
                     currentService.getStartCmd());
         });
     }
@@ -117,7 +118,7 @@ public class ServiceController extends Controller {
     @FXML
     void 停止服务(ActionEvent event) {
         rootController.getSelectedServerConfigs().stream().forEach(serverConfig -> {
-            String res = rootController.getExecResult(serverConfig,
+            String res = JschUtil.getExecResult(serverConfig,
                     currentService.getStopCmd());
         });
 
@@ -161,8 +162,8 @@ public class ServiceController extends Controller {
     @SneakyThrows
     @FXML
     void 采集日志压缩包(ActionEvent event) {
-        for (ServerConfig serverConfig : rootController.getSelectedServerConfigs()) {
-            ChannelSftp channelSftp = rootController.getSftpChannel(serverConfig);
+        for (MyServerConfig serverConfig : rootController.getSelectedServerConfigs()) {
+            ChannelSftp channelSftp = JschUtil.getSftpChannel(serverConfig);
             Vector<ChannelSftp.LsEntry> files = channelSftp.ls(currentService.getLogPath());
             for (ChannelSftp.LsEntry file : files) {
                 if (file.getFilename().contains(currentService.getLoggzPatten())) {
@@ -176,8 +177,8 @@ public class ServiceController extends Controller {
     @FXML
     @SneakyThrows
     void 采集日志(ActionEvent event) {
-        for (ServerConfig serverConfig : rootController.getSelectedServerConfigs()) {
-            ChannelSftp channelSftp = rootController.getSftpChannel(serverConfig);
+        for (MyServerConfig serverConfig : rootController.getSelectedServerConfigs()) {
+            ChannelSftp channelSftp = JschUtil.getSftpChannel(serverConfig);
             Vector<ChannelSftp.LsEntry> files = channelSftp.ls(currentService.getLogPath());
             for (ChannelSftp.LsEntry file : files) {
                 if (file.getFilename().endsWith("log")) {
@@ -192,8 +193,8 @@ public class ServiceController extends Controller {
 @FXML
     @SneakyThrows
     void 上传本地jar包(ActionEvent event) {
-        for (ServerConfig serverConfig : rootController.getSelectedServerConfigs()) {
-            ChannelSftp channelSftp = rootController.getSftpChannel(serverConfig);
+        for (MyServerConfig serverConfig : rootController.getSelectedServerConfigs()) {
+            ChannelSftp channelSftp = JschUtil.getSftpChannel(serverConfig);
             String replaceAll = currentService.getLocalFiles().replaceAll("\\n", "");
             String[] files = replaceAll.split(";");
             for (String s : files) {
@@ -221,17 +222,17 @@ public class ServiceController extends Controller {
     @FXML
     @SneakyThrows
     void 采集堆栈(ActionEvent event) {
-        for (ServerConfig serverConfig : rootController.getSelectedServerConfigs()) {
-             String pid = rootController.getExecResult(serverConfig,
+        for (MyServerConfig serverConfig : rootController.getSelectedServerConfigs()) {
+             String pid = JschUtil.getExecResult(serverConfig,
                     "ps -ef|grep " + currentService.getServiceName() +
                             " |grep -v grep|awk '{print $2 }'").replaceAll("\n","");;
             String path="/home/" + serverConfig.getServiceUsername() +
             "/heap.bin";
-            String execResult = rootController.ExecShell(serverConfig,
+            String execResult = JschUtil.ExecShell(serverConfig,
                     "su - " + serverConfig.getServiceUsername() + " -c 'jmap -dump:format=b,file="+path+" " + pid + "'");
             System.out.println(execResult);
-            ChannelSftp channelSftp = rootController.getSftpChannel(serverConfig);
-            if(!rootController.isFileExist(channelSftp,path)){
+            ChannelSftp channelSftp = JschUtil.getSftpChannel(serverConfig);
+            if(!JschUtil.isFileExist(channelSftp,path)){
                 DialogUtils.AlertInfomation("生成dump文件失败");
                 return;
             }
@@ -247,7 +248,7 @@ public class ServiceController extends Controller {
     @FXML
     void 获取进程id(ActionEvent event) {
         rootController.getSelectedServerConfigs().stream().forEach(serverConfig -> {
-            String execResult = rootController.getExecResult(serverConfig,
+            String execResult = JschUtil.getExecResult(serverConfig,
                     "ps -ef|grep " + currentService.getServiceName() +
                             " |grep -v grep|awk '{print $2 }'");
             DialogUtils.AlertInfomation("此服务的进程id是" + execResult);

@@ -2,14 +2,19 @@ package ch.makery.address.view;
 
 import ch.makery.address.anotation.DefaultView;
 import ch.makery.address.model.Context;
-import ch.makery.address.model.ServerConfig;
+import ch.makery.address.model.MyServerConfig;
 import ch.makery.address.util.Controller;
 import ch.makery.address.util.DialogController;
 import ch.makery.address.util.DialogUtils;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.cky.jsch.JschUtil;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.jcraft.jsch.*;
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.Session;
+import com.jcraft.jsch.SftpATTRS;
+import com.jcraft.jsch.SftpException;
 import javafx.beans.property.BooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -21,20 +26,17 @@ import javafx.scene.layout.AnchorPane;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Vector;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -48,23 +50,22 @@ public class RootController extends Controller {
     private File preferFile;
     @FXML
     private AnchorPane serverPane;
-    private Cache<String, Object> cache;
     @FXML
-    private ListView<ServerConfig> serverList;
+    private ListView<MyServerConfig> serverList;
     private File defaultServerConfig;
     private Context context;
     public RootController() {
         System.out.println("我被创建了 " + this);
     }
 
-    public static void main(String[] args) throws SftpException {
-        ChannelSftp sftpChannel = new RootController().getSftpChannel(new ServerConfig("192.168.208.128", 22, "虚拟机192.168.208.128", "chenkaiyu", "root", "qq634691", null));
-        String targetDir = "\\home\\chenkaiyu\\com\\example\\demo";
-        targetDir = targetDir.replaceAll("\\\\", "/");
-        sftpChannel.put("F://test/com/example/demo/BBking.java", targetDir);
-        SftpATTRS lstat = sftpChannel.lstat(targetDir + "/" + "BBking.java");
-        System.out.println(lstat);
-    }
+//    public static void main(String[] args) throws SftpException {
+//        ChannelSftp sftpChannel = JschUtil.getSftpChannel(new MyServerConfig("192.168.208.128", 22, "虚拟机192.168.208.128", "chenkaiyu", "root", "qq634691", null));
+//        String targetDir = "\\home\\chenkaiyu\\com\\example\\demo";
+//        targetDir = targetDir.replaceAll("\\\\", "/");
+//        sftpChannel.put("F://test/com/example/demo/BBking.java", targetDir);
+//        SftpATTRS lstat = sftpChannel.lstat(targetDir + "/" + "BBking.java");
+//        System.out.println(lstat);
+//    }
 
     @FXML
     void close(ActionEvent event) {
@@ -74,12 +75,12 @@ public class RootController extends Controller {
     @FXML
     @SneakyThrows
     void 添加服务器(ActionEvent event) {
-        ServerConfig serverConfig = new ServerConfig();
+        MyServerConfig serverConfig = new MyServerConfig();
         DialogController controller =
                 mainApp.openEditDialogForResult("添加服务器", "ServerConfig.fxml", serverConfig);
         if (controller.okClicked) {
             try {
-                Session rootSession = getRootSession(serverConfig);
+                Session rootSession = JschUtil.getRootSession(serverConfig);
             } catch (Exception e) {
                 DialogUtils.AlertInfomation("无法登陆");
                 return;
@@ -97,12 +98,12 @@ public class RootController extends Controller {
     @FXML
     @SneakyThrows
     void 复制服务器(ActionEvent event) {
-        ServerConfig serverConfig = serverList.getSelectionModel().getSelectedItem();
+        MyServerConfig serverConfig = serverList.getSelectionModel().getSelectedItem();
         if (serverConfig == null) {
             DialogUtils.AlertInfomation("必须先选中服务器才能复制");
             return;
         }
-        ServerConfig clone = serverConfig.clone();
+        MyServerConfig clone = JSONObject.parseObject(JSONObject.toJSONString(serverConfig),MyServerConfig.class);
         DialogController controller =
                 mainApp.openEditDialogForResult("复制服务器", "ServerConfig.fxml", clone);
         if (controller.okClicked) {
@@ -113,9 +114,9 @@ public class RootController extends Controller {
     @SneakyThrows
     @FXML
     void 生成覆盖率报告(ActionEvent event) {
-        for (ServerConfig serverConfig : getSelectedServerConfigs()) {
+        for (MyServerConfig serverConfig : getSelectedServerConfigs()) {
             //下载文件到本地
-            ChannelSftp channelSftp = getSftpChannel(serverConfig);
+            ChannelSftp channelSftp = JschUtil.getSftpChannel(serverConfig);
             Vector<ChannelSftp.LsEntry> files = channelSftp.ls(getContext().getCoveragePath());
             for (ChannelSftp.LsEntry file : files) {
                 if (!file.getAttrs().isDir()) {
@@ -134,8 +135,8 @@ public class RootController extends Controller {
         //执行命令生成报告
     }
 
-    public List<ServerConfig> getSelectedServerConfigs() {
-        ObservableList<ServerConfig> items = getServerList().getItems();
+    public List<MyServerConfig> getSelectedServerConfigs() {
+        ObservableList<MyServerConfig> items = getServerList().getItems();
         return items.stream()
                 .filter(serverConfig -> serverConfig.getSelected().get()).collect(
                         Collectors.toList());
@@ -154,8 +155,8 @@ public class RootController extends Controller {
 
     @FXML
     void 编辑服务器(ActionEvent event) {
-        ServerConfig serverConfig = serverList.getSelectionModel().getSelectedItem();
-        ServerConfig clone = serverConfig.clone();
+        MyServerConfig serverConfig = serverList.getSelectionModel().getSelectedItem();
+        MyServerConfig clone = JSONObject.parseObject(JSONObject.toJSONString(serverConfig),MyServerConfig.class);
         if (serverConfig == null) {
             DialogUtils.AlertInfomation("必须先选中服务器才能编辑");
             return;
@@ -165,7 +166,7 @@ public class RootController extends Controller {
 
         if (controller.isOkClicked()) {
             try {
-                Session rootSession = getRootSession(serverConfig);
+                Session rootSession = JschUtil.getRootSession(serverConfig);
             } catch (Exception e) {
                 DialogUtils.AlertInfomation("无法登陆");
                 serverConfig.setRootPassword(clone.getRootPassword());
@@ -182,7 +183,7 @@ public class RootController extends Controller {
 
     @FXML
     void 删除服务器(ActionEvent event) {
-        ServerConfig serverConfig = serverList.getSelectionModel().getSelectedItem();
+        MyServerConfig serverConfig = serverList.getSelectionModel().getSelectedItem();
         if (serverConfig == null) {
             DialogUtils.AlertInfomation("必须先选中服务器才能删除");
             return;
@@ -199,16 +200,16 @@ public class RootController extends Controller {
     @FXML
     @SneakyThrows
     void 服务器时间同步(ActionEvent event) {
-        List<ServerConfig> configs = getSelectedServerConfigs();
+        List<MyServerConfig> configs = getSelectedServerConfigs();
         if (configs.size() == 0) {
             DialogUtils.AlertInfomation("必须先选中服务器才能同步");
             return;
         }
         DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
-        for (ServerConfig serverConfig : configs) {
-            String execResult = ExecShell(serverConfig,
+        for (MyServerConfig serverConfig : configs) {
+            String execResult = JschUtil.ExecShell(serverConfig,
                     "date -s " + dateTimeFormatter.print(System.currentTimeMillis()));
-            DialogUtils.AlertInfomation("同步成功 服务器时间为" + getExecResult(serverConfig, "date"));
+            DialogUtils.AlertInfomation("同步成功 服务器时间为" + JschUtil.getExecResult(serverConfig, "date"));
         }
     }
 
@@ -225,7 +226,7 @@ public class RootController extends Controller {
         if (!configFile.exists()) {
             return;
         }
-        List parse = FileUtil.readArray(configFile, ServerConfig.class);
+        List parse = FileUtil.readArray(configFile, MyServerConfig.class);
         serverList.setItems(FXCollections.observableList(parse));
         serverList.setCellFactory(CheckBoxListCell.forListView(
                 serverConfig -> {
@@ -237,9 +238,6 @@ public class RootController extends Controller {
     @SneakyThrows
     @Override
     public void initController() {
-        CacheBuilder<Object, Object> cacheBuilder = CacheBuilder.newBuilder();
-        cacheBuilder.expireAfterWrite(5, TimeUnit.MINUTES);
-        cache = cacheBuilder.build();
         String dir = System.getProperty("user.dir");
         defaultServerConfig = new File(dir + "/" + "server.json");
         loadConfig(defaultServerConfig);
@@ -258,116 +256,5 @@ public class RootController extends Controller {
 
         }
 
-    }
-
-    @SneakyThrows
-    public Session getRootSession(ServerConfig selectedItem) {
-        if (selectedItem.getRootUsername() == null) {
-            throw new Exception("必须提供root用户名密码才能抓包");
-        }
-        return (Session) cache.get(selectedItem.getIp() + "Session", () -> createNewSession(selectedItem));
-    }
-
-    private Session createNewSession(ServerConfig selectedItem) throws JSchException {
-        JSch jsch = new JSch();
-        Session session = jsch.getSession(selectedItem.getRootUsername(), selectedItem.getIp(), selectedItem.getPort());
-        session.setConfig("StrictHostKeyChecking", "no");
-        session.setPassword(selectedItem.getRootPassword());
-        session.connect();
-        return session;
-    }
-
-    @SneakyThrows
-    public String getAsyncExecResult(ServerConfig selectedItem, String cmd) {
-        Session session = getRootSession(selectedItem);
-        ChannelShell channel = (ChannelShell) session.openChannel("shell");
-        channel.connect();
-        log.info("执行命令--{}", cmd);
-        CountDownLatch countDownLatch = new CountDownLatch(1);
-        StringBuffer result = new StringBuffer();
-        CompletableFuture.runAsync(() -> {
-            try {
-                Thread.sleep(200);
-                BufferedReader bufferedReader = new BufferedReader(
-                        new InputStreamReader(channel.getInputStream(),
-                                StandardCharsets.UTF_8));
-                String line;
-                while ((line = bufferedReader.readLine()) != null) {
-                    if (line.contains(selectedItem.getRootUsername())) break;
-                    result.append(line + System.lineSeparator());
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            countDownLatch.countDown();
-        });
-        PrintWriter printWriter = new PrintWriter(channel.getOutputStream());
-        printWriter.println(cmd);
-        printWriter.flush();
-        printWriter.close();
-        countDownLatch.await(5, TimeUnit.SECONDS);
-        return result.toString();
-    }
-
-    @SneakyThrows
-    public String getExecResult(ServerConfig selectedItem, String cmd) {
-        String result =
-                ExecShell(selectedItem, cmd);
-        if (StringUtils.isEmpty(result)) {
-            log.error("同步无法获得结果 改为异步");
-            result = getAsyncExecResult(selectedItem, cmd);
-        }
-        return result;
-    }
-
-    @SneakyThrows
-    public String ExecShell(ServerConfig selectedItem, String cmd) {
-        Session session = getRootSession(selectedItem);
-        ChannelExec channel = (ChannelExec) session.openChannel("exec");
-        channel.setCommand(cmd);
-        log.info("执行命令--{}", cmd);
-        channel.connect();
-        String result =
-                new String(IOUtils.toByteArray(channel.getInputStream()), StandardCharsets.UTF_8);
-        return result;
-    }
-
-    @SneakyThrows
-    public ChannelSftp getSftpChannel(ServerConfig selectedItem) {
-        return (ChannelSftp) cache.get(selectedItem.getIp() + "SftpChannel", () -> createNewChannel(selectedItem));
-    }
-
-    private ChannelSftp createNewChannel(ServerConfig selectedItem) throws JSchException {
-        Session session = getRootSession(selectedItem);
-        ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
-        channel.connect();
-        return channel;
-    }
-
-    public boolean isFileExist(ChannelSftp sftpChannel, String path) {
-        try {
-            SftpATTRS lstat = sftpChannel.lstat(path);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public void recursiveDelete(ChannelSftp sftp, String path)
-            throws SftpException {
-        Vector<?> entries = sftp.ls(path);
-        for (Object object : entries) {
-            ChannelSftp.LsEntry entry = (ChannelSftp.LsEntry) object;
-            if (entry.getFilename().equals(".")
-                    || entry.getFilename().equals("..")) {
-                continue;
-            }
-            if (entry.getAttrs().isDir()) {
-                recursiveDelete(sftp, path + entry.getFilename() + "/");
-            } else {
-                sftp.rm(path + entry.getFilename());
-            }
-        }
-        sftp.rmdir(path);
     }
 }
