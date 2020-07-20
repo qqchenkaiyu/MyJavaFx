@@ -207,8 +207,8 @@ public class RootController extends Controller {
         }
         DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
         for (MyServerConfig serverConfig : configs) {
-            String execResult = JschUtil.ExecShell(serverConfig,
-                    "date -s " + dateTimeFormatter.print(System.currentTimeMillis()));
+           String execResult = ExecShell(serverConfig,
+                    "date -s  \"" + dateTimeFormatter.print(System.currentTimeMillis())+"\"");
             DialogUtils.AlertInfomation("同步成功 服务器时间为" + JschUtil.getExecResult(serverConfig, "date"));
         }
     }
